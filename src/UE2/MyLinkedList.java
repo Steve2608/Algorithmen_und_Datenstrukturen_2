@@ -117,16 +117,13 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 		MyListNode ret = null;
 		if (size() == 1) {
 			ret = head;
-			ret.setNext(null); // just to be sure
 			head = tail = null;
 		} else if (size() == 2) {
 			ret = head;
-			head = tail = ret.getNext();
 			ret.setNext(null);
 		} else {
 			ret = head;
 			head = head.getNext();
-			ret.setNext(null); // just to be sure
 		}
 		size--;
 		return ret != null ? ret.getElement() : null;
