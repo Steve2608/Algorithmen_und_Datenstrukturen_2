@@ -120,7 +120,7 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 			head = tail = null;
 		} else if (size() == 2) {
 			ret = head;
-			ret.setNext(null);
+			head = tail;
 		} else {
 			ret = head;
 			head = head.getNext();
