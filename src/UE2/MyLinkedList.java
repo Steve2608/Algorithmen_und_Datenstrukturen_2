@@ -1,8 +1,8 @@
 package UE2;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.StringJoiner;
 
 public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long> {
 
@@ -223,7 +223,11 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 
 	@Override
 	public String toString() {
-		return "Size=" + size() + " " + Arrays.toString(toArray());
+		final StringJoiner joiner = new StringJoiner(", ");
+		for (final Long val : this)
+			joiner.add(val.toString());
+
+		return "MyLinkedList[" + joiner + "]";
 	}
 
 	@Override
