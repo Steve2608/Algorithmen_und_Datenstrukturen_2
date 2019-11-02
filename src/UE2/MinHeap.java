@@ -7,14 +7,12 @@ public class MinHeap<FuckingAngabe> implements MyPriorityQueue<Long> {
 	private static final int MIN_INDEX = 1, EMPTY_INDEX = -1;
 
 	private Long[] content;
-	private int maxSize;
 	private int size;
 
 	public MinHeap(final int capacity) {
 		if (capacity <= 0)
 			throw new IllegalArgumentException("Capacity must be positive: " + capacity);
 		content = new Long[capacity + 1];
-		maxSize = capacity;
 	}
 
 	@Override
@@ -31,7 +29,7 @@ public class MinHeap<FuckingAngabe> implements MyPriorityQueue<Long> {
 	public void insert(final Long val) throws IllegalArgumentException {
 		if (val == null)
 			throw new IllegalArgumentException("Cannot add a null value");
-		if (size() == maxSize) doubleSize();
+		if (size() >= content.length - 1) doubleSize();
 
 		content[++size] = val; // index 0 left blank
 		upHeap(size());
@@ -41,7 +39,6 @@ public class MinHeap<FuckingAngabe> implements MyPriorityQueue<Long> {
 		final Long[] copy = content;
 		// remember to keep one blank field
 		content = new Long[content.length * 2];
-		maxSize *= 2;
 		System.arraycopy(copy, MIN_INDEX, content, MIN_INDEX, copy.length - 1);
 	}
 
@@ -52,19 +49,19 @@ public class MinHeap<FuckingAngabe> implements MyPriorityQueue<Long> {
 	@Override
 	public Long removeMin() throws NoSuchElementException {
 		if (isEmpty())
-			throw new NoSuchElementException("There is no element to be removed");
+			throw new NoSuchElementException("There is no min element to be removed");
 
 		swap(1, size());
 		final Long ret = content[size()];
 		content[size--] = null;
-		downHeap(1);
+		downHeap(MIN_INDEX);
 		return ret;
 	}
 
 	@Override
 	public Long min() throws NoSuchElementException {
 		if (isEmpty())
-			throw new NoSuchElementException("There is no element to be looked at");
+			throw new NoSuchElementException("There is no min Element");
 		return content[MIN_INDEX];
 	}
 
@@ -75,8 +72,8 @@ public class MinHeap<FuckingAngabe> implements MyPriorityQueue<Long> {
 	@Override
 	public Object[] toArray() {
 		// excluding the first (null) Element.
-		final Long[] obj = new Long[size];
-		System.arraycopy(content, 1, obj, 0, size);
+		final Long[] obj = new Long[size()];
+		System.arraycopy(content, 1, obj, 0, size());
 		return obj;
 	}
 
@@ -122,11 +119,7 @@ public class MinHeap<FuckingAngabe> implements MyPriorityQueue<Long> {
 
 	private boolean canDownHeap(final int index, final int left, final int right) {
 		return validIndex(index) && validIndex(left) &&
-				       (content[left] < content[index] || validIndex(right) && content[right] < content[index]);
-	}
-
-	private Long min(final Long a, final Long b) {
-		return a < b ? a : b;
+				(content[left] < content[index] || validIndex(right) && content[right] < content[index]);
 	}
 
 	private int parent(final int index) {
