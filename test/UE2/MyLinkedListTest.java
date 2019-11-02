@@ -92,7 +92,11 @@ class MyLinkedListTest {
 		list.clear();
 
 		assertEquals(0, list.size());
-		assertNull(list.get(0));
+		try {
+			assertNull(list.get(0));
+		} catch (final IndexOutOfBoundsException e) {
+			// either return null or throw IOOB Exception
+		}
 	}
 
 	@Test
