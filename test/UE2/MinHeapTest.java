@@ -21,7 +21,7 @@ class MinHeapTest {
 
 	@AfterEach
 	void tearDown() {
-		heap = new MyListPriorityQueue<>();
+		heap = new MinHeap<>(3);
 	}
 
 	@Test
@@ -58,7 +58,6 @@ class MinHeapTest {
 
 		heap.insert(10L);
 		assertArrayEquals(new Long[]{2L, 7L, 9L, 15L, 11L, 10L}, heap.toArray());
-
 	}
 
 	@Test
@@ -89,6 +88,6 @@ class MinHeapTest {
 		heap.removeMin();
 		heap.removeMin();
 
-		assertArrayEquals(new Long[]{}, heap.toArray());
+		assertArrayEquals(new Long[0], heap.toArray());
 	}
 }
