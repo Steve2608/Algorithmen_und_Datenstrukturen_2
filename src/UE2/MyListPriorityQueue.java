@@ -4,7 +4,7 @@ import java.util.NoSuchElementException;
 
 public class MyListPriorityQueue<FuckingAngabe> implements MyPriorityQueue<Long> {
 
-	private final MyLinkedList list = new MyLinkedList();
+	private final MyList<Long> list = new MyLinkedList<>();
 
 	@Override
 	public boolean isEmpty() {
@@ -23,9 +23,11 @@ public class MyListPriorityQueue<FuckingAngabe> implements MyPriorityQueue<Long>
 
 	@Override
 	public Long removeMin() {
-		final Long f = list.removeFirst();
-		if (f == null) throw new NoSuchElementException("No min element present");
-		return f;
+		try {
+			return list.remove(0);
+		} catch (final IndexOutOfBoundsException e) {
+			throw new NoSuchElementException("No min element present");
+		}
 	}
 
 	@Override
