@@ -1,6 +1,5 @@
 package UE2;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,18 +9,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MyLinkedListTest {
 
-	private MyList<Long> list = new MyLinkedList<>();
+	private MyList<Long> list;
 
 	@BeforeEach
 	void setUp() {
+		list = new MyLinkedList<>();
 		list.addFirst(4L);
 		list.addFirst(2L);
 		list.addFirst(6L);
-	}
-
-	@AfterEach
-	void tearDown() {
-		list = new MyLinkedList<>();
 	}
 
 	@Test

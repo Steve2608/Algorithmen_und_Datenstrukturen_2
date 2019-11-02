@@ -1,6 +1,5 @@
 package UE2;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,18 +9,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MinHeapTest {
 
-	private MyPriorityQueue<Long> heap = new MinHeap<>(3);
+	private MyPriorityQueue<Long> heap;
 
 	@BeforeEach
 	void setUp() {
+		heap = new MinHeap<>(3);
 		heap.insert(11L);
 		heap.insert(7L);
 		heap.insert(9L);
-	}
-
-	@AfterEach
-	void tearDown() {
-		heap = new MinHeap<>(3);
 	}
 
 	@Test
