@@ -4,22 +4,25 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringJoiner;
 
-public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long> {
+public class MyLinkedList<T extends Comparable<T>> implements MyList<T>, Iterable<T> {
 
-	private MyListNode head, tail;
-	private int size;
+	private MyListNode<T> head = null, tail = null;
+	private boolean isAscending = true, isDescending = true;
+	private int size = 0;
 
 	public MyLinkedList() {
 	}
 
-	public MyLinkedList(final Long[] array) {
+	public MyLinkedList(final T[] array) {
 		buildFromArray(array);
+		isAscending = checkIsAscending();
+		isDescending = checkIsDescending();
 	}
 
-	private void buildFromArray(final Long[] array) {
+	private void buildFromArray(final Object[] array) {
 		clear();
-		for (final Long f : array) {
-			addLast(f);
+		for (final Object val : array) {
+			addLast((T) val);
 		}
 	}
 
@@ -28,99 +31,156 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 		return size;
 	}
 
-	private void inputCheck(final Long elem) {
+	public boolean isEmpty() {
+		return size() <= 0;
+	}
+
+	private void addOnlyNode(final T elem) {
+		head = tail = new MyListNode<>(elem);
+		isAscending = isDescending = true;
+		size = 1;
+	}
+
+	private void inputCheck(final T elem) {
 		if (elem == null) throw new IllegalArgumentException("Parameter can't be null");
 	}
 
 	@Override
-	public void addFirst(final Long elem) throws IllegalArgumentException {
+	public void addFirst(final T elem) throws IllegalArgumentException {
 		inputCheck(elem);
 
 		if (head == null) {
-			head = tail = new MyListNode(elem);
+			addOnlyNode(elem);
 		} else {
-			final MyListNode temp = new MyListNode(elem);
-			temp.setNext(head);
-			head = temp;
+			head = new MyListNode<>(elem, head);
+			isAscending &= elem.compareTo(head.getNext().getElement()) <= 0;
+			isDescending &= head.getNext().getElement().compareTo(elem) <= 0;
+			size++;
 		}
-		size++;
 	}
 
 	@Override
-	public void addLast(final Long elem) throws IllegalArgumentException {
+	public void addLast(final T elem) throws IllegalArgumentException {
 		inputCheck(elem);
 
 		if (head == null) {
-			head = tail = new MyListNode(elem);
+			addOnlyNode(elem);
 		} else {
-			final MyListNode temp = new MyListNode(elem);
+			final MyListNode<T> temp = new MyListNode<>(elem);
 			tail.setNext(temp);
+			isAscending &= tail.getElement().compareTo(elem) <= 0;
+			isDescending &= tail.getElement().compareTo(elem) >= 0;
 			tail = temp;
+			size++;
 		}
-		size++;
 	}
 
 	@Override
-	public void addSorted(final Long val) throws IllegalArgumentException {
+	public void addSorted(final T val) throws IllegalArgumentException {
 		inputCheck(val);
 
-		addLast(val);
-		sortASC();
+		if (isEmpty()) addOnlyNode(val);
+		else if (isAscending) addSortedAscending(val);
+		else {
+			addLast(val);
+			sortASC();
+		}
+	}
+
+	private void addSortedAscending(final T val) {
+		if (val.compareTo(head.getElement()) < 0) {
+			head = new MyListNode<>(val, head);
+			isDescending &= val.compareTo(head.getNext().getElement()) >= 0;
+		} else if (val.compareTo(tail.getElement()) > 0) {
+			final MyListNode<T> temp = new MyListNode<>(val);
+			tail.setNext(temp);
+			isDescending &= tail.getElement().compareTo(val) >= 0;
+			tail = temp;
+		} else {
+			MyListNode<T> next = head.getNext(), prev = head;
+			while (next != null && next.getElement().compareTo(val) < 0) {
+				prev = next;
+				next = next.getNext();
+			}
+
+			final MyListNode<T> temp = new MyListNode<>(val, next);
+			prev.setNext(temp);
+			isDescending &= val.compareTo(next.getElement()) >= 0;
+		}
+		size++;
+	}
+
+	private boolean checkIsAscending() {
+		for (MyListNode<T> curr = head; curr != tail; curr = curr.getNext()) {
+			if (curr.getElement().compareTo(curr.getNext().getElement()) > 0) return false;
+		}
+		return true;
+	}
+
+	private boolean checkIsDescending() {
+		for (MyListNode<T> curr = head; curr != tail; curr = curr.getNext()) {
+			if (curr.getElement().compareTo(curr.getNext().getElement()) < 0) return false;
+		}
+		return true;
 	}
 
 	@Override
 	public void sortASC() {
-		final Long[] longs = toLongs();
+		if (isAscending) return;
 
-		for (int i = 0; i < longs.length; i++) {
+		final Object[] vals = toArray();
+		for (int i = 0; i < vals.length; i++) {
 			int min = i;
-			for (int j = i + 1; j < longs.length; j++) {
-				if (longs[j].compareTo(longs[min]) < 0) {
+			for (int j = i + 1; j < vals.length; j++) {
+				if (((T) vals[j]).compareTo((T) vals[min]) < 0) {
 					min = j;
 				}
 			}
-			final Long tmp = longs[i];
-			longs[i] = longs[min];
-			longs[min] = tmp;
+			final Object tmp = vals[i];
+			vals[i] = vals[min];
+			vals[min] = tmp;
 		}
-		buildFromArray(longs);
+		buildFromArray(vals);
+		isAscending = true;
+		isDescending = checkIsDescending();
 	}
 
 	@Override
 	public void sortDES() {
-		final Long[] Longs = toLongs();
+		if (isDescending) return;
 
-		for (int i = 0; i < Longs.length; i++) {
+		final Object[] vals = toArray();
+		for (int i = 0; i < vals.length; i++) {
 			int max = i;
-			for (int j = i + 1; j < Longs.length; j++) {
-				if (Longs[j].compareTo(Longs[max]) > 0) {
+			for (int j = i + 1; j < vals.length; j++) {
+				if (((T) vals[j]).compareTo((T) vals[max]) > 0) {
 					max = j;
 				}
 			}
-			final Long tmp = Longs[i];
-			Longs[i] = Longs[max];
-			Longs[max] = tmp;
+			final Object tmp = vals[i];
+			vals[i] = vals[max];
+			vals[max] = tmp;
 		}
-		buildFromArray(Longs);
+		buildFromArray(vals);
+		isAscending = checkIsAscending();
+		isDescending = true;
 	}
 
 	@Override
 	public void clear() {
 		head = tail = null;
+		isAscending = isDescending = true;
 		size = 0;
 	}
 
 	@Override
-	public Long removeFirst() {
-		if (size() == 0) return null;
+	public T removeFirst() {
+		if (isEmpty()) return null;
 
-		MyListNode ret = null;
+		MyListNode<T> ret = null;
 		if (size() == 1) {
 			ret = head;
 			head = tail = null;
-		} else if (size() == 2) {
-			ret = head;
-			head = tail;
 		} else {
 			ret = head;
 			head = head.getNext();
@@ -130,19 +190,15 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 	}
 
 	@Override
-	public Long removeLast() {
-		if (size() == 0) return null;
+	public T removeLast() {
+		if (isEmpty()) return null;
 
-		final Long ret;
+		final T ret;
 		if (size() == 1) {
 			ret = tail.getElement();
 			head = tail = null;
-		} else if (size() == 2) {
-			ret = tail.getElement();
-			tail = head;
-			head.setNext(null);
 		} else {
-			MyListNode curr = head;
+			MyListNode<T> curr = head;
 			for (int i = 0; i < size() - 2; i++) {
 				curr = curr.getNext();
 			}
@@ -155,34 +211,32 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 	}
 
 	@Override
-	public Long getFirst() {
+	public T getFirst() {
 		return head != null ? head.getElement() : null;
 	}
 
 	@Override
-	public Long getLast() {
+	public T getLast() {
 		return tail != null ? tail.getElement() : null;
 	}
 
 	@Override
-	public boolean contains(final Long val) throws IllegalArgumentException {
+	public boolean contains(final T val) throws IllegalArgumentException {
 		inputCheck(val);
-
-		for (final Long f : this) {
+		for (final T f : this)
 			if (f.equals(val)) return true;
-		}
 		return false;
 	}
 
 	@Override
-	public Long get(final int index) {
-		if (index < 0 || index >= size()) return null;
+	public T get(final int index) {
+		if (index < 0 || index >= size()) throw new IndexOutOfBoundsException(index);
 
 		if (index == 0) return getFirst();
 		if (index == size() - 1) return getLast();
 
 		// Ignore first Element
-		MyListNode curr = head.getNext();
+		MyListNode<T> curr = head.getNext();
 		for (int i = 1; i < index; i++) {
 			curr = curr.getNext();
 		}
@@ -190,32 +244,27 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 	}
 
 	@Override
-	public Long remove(final int index) {
-		if (index < 0 || index >= size()) return null;
+	public T remove(final int index) {
+		if (index < 0 || index >= size()) throw new IndexOutOfBoundsException(index);
 
 		if (index == 0) return removeFirst();
 		if (index == size() - 1) return removeLast();
 
-		MyListNode curr = head;
+		MyListNode<T> curr = head;
 		for (int i = 0; i < index - 1; i++) {
 			curr = curr.getNext();
 		}
-		final MyListNode toRemove = curr.getNext();
+		final MyListNode<T> toRemove = curr.getNext();
 		curr.setNext(toRemove.getNext());
-		toRemove.setNext(null);
 		size--;
 		return toRemove.getElement();
 	}
 
 	@Override
 	public Object[] toArray() {
-		return toLongs();
-	}
-
-	private Long[] toLongs() {
-		final Long[] obj = new Long[size()];
+		final Object[] obj = new Object[size()];
 		int i = 0;
-		for (final Long f : this) {
+		for (final T f : this) {
 			obj[i++] = f;
 		}
 		return obj;
@@ -224,17 +273,17 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 	@Override
 	public String toString() {
 		final StringJoiner joiner = new StringJoiner(", ");
-		for (final Long val : this)
+		for (final T val : this)
 			joiner.add(val.toString());
 
-		return "MyLinkedList[" + joiner + "]";
+		return String.format("MyLinkedList(asc=%b, des=%b)[%s]", isAscending, isDescending, joiner.toString());
 	}
 
 	@Override
-	public Iterator<Long> iterator() {
+	public Iterator<T> iterator() {
 		return new Iterator<>() {
 
-			MyListNode current = head;
+			private MyListNode<T> current = head;
 
 			@Override
 			public boolean hasNext() {
@@ -242,9 +291,9 @@ public class MyLinkedList<FuckingAngabe> implements MyList<Long>, Iterable<Long>
 			}
 
 			@Override
-			public Long next() {
+			public T next() {
 				if (!hasNext()) throw new NoSuchElementException();
-				final Long ret = current.getElement();
+				final T ret = current.getElement();
 				current = current.getNext();
 				return ret;
 			}

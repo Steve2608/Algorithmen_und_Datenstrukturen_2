@@ -1,6 +1,6 @@
 package UE2;
 
-public interface MyList<T> {
+public interface MyList<T extends Comparable<T>> {
 	int size();
 	//Returns number of elements in the List (inO(1))
 

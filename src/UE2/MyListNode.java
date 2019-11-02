@@ -1,33 +1,32 @@
 package UE2;
 
-public class MyListNode<FuckingAngabe> {
+public class MyListNode<T> {
 
-	private Long element;
-	private MyListNode next;
+	private final T element;
+	private MyListNode<T> next;
 
-	public MyListNode() {
-		element = null;
-		next = null;
+	MyListNode() {
+		this(null, null);
 	}
 
-	public MyListNode(final Long element) {
+	MyListNode(final T element) {
+		this(element, null);
+	}
+
+	MyListNode(final T element, final MyListNode<T> next) {
 		this.element = element;
-		next = null;
+		this.next = next;
 	}
 
-	public Long getElement() {
+	T getElement() {
 		return element;
 	}
 
-	public void setElement(final Long element) {
-		this.element = element;
-	}
-
-	public MyListNode getNext() {
+	MyListNode<T> getNext() {
 		return next;
 	}
 
-	public void setNext(final MyListNode next) {
+	void setNext(final MyListNode<T> next) {
 		this.next = next;
 	}
 

@@ -4,6 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MyLinkedListTest {
@@ -177,6 +179,19 @@ class MyLinkedListTest {
 
 		list.clear();
 		assertArrayEquals(new Long[]{}, list.toArray());
+	}
+
+	@Test
+	void manyElems() {
+		assertTimeout(Duration.ofMillis(500), () -> {
+			for (int i = 0; i < 10_000; i++) {
+				list.addSorted((long) (Math.random() * 1_000_000_000));
+			}
+		});
+
+		// Indexed access is the slowest operation basically
+		for (int i = 0; i < list.size() - 1; i++)
+			assertTrue(list.get(i) <= list.get(i + 1));
 	}
 
 }
