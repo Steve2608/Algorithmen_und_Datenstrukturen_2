@@ -2,9 +2,9 @@ package UE2;
 
 import java.util.NoSuchElementException;
 
-public class MyListPriorityQueue<FuckingAngabe> implements MyPriorityQueue<Long> {
+public class MyListPriorityQueue<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
-	private final MyList<Long> list = new MyLinkedList<>();
+	private final MyList<T> list = new MyLinkedList<>();
 
 	@Override
 	public boolean isEmpty() {
@@ -17,12 +17,12 @@ public class MyListPriorityQueue<FuckingAngabe> implements MyPriorityQueue<Long>
 	}
 
 	@Override
-	public void insert(final Long elem) {
+	public void insert(final T elem) {
 		list.addSorted(elem);
 	}
 
 	@Override
-	public Long removeMin() {
+	public T removeMin() {
 		try {
 			return list.remove(0);
 		} catch (final IndexOutOfBoundsException e) {
@@ -31,8 +31,8 @@ public class MyListPriorityQueue<FuckingAngabe> implements MyPriorityQueue<Long>
 	}
 
 	@Override
-	public Long min() {
-		final Long f = list.getFirst();
+	public T min() {
+		final T f = list.getFirst();
 		if (f == null) throw new NoSuchElementException("No min element present");
 		return f;
 	}

@@ -2,7 +2,7 @@ package UE2;
 
 import java.util.NoSuchElementException;
 
-public interface MyPriorityQueue<T> {
+public interface MyPriorityQueue<T extends Comparable<T>> {
 	boolean isEmpty();          //Returns true if the PQ is empty; false otherwise
 
 	int size();                 //Returns the current size of the PQ
