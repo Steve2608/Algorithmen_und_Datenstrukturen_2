@@ -77,24 +77,9 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 		return obj;
 	}
 
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 1; validIndex(i); i++) {
-			sb.append(String.format("[i=%d, v=%s, left=%d, right=%d, parent=%d%n",
-					i, content[i].toString(), leftChild(i), rightChild(i), parent(i)
-			));
-		}
-		return sb.append(String.format("{ Size = %d }%n", size())).toString();
-	}
-
-	private void upHeap(final int p_index) {
-		int v_index = p_index, v_parent = parent(v_index);
-
-		while (v_parent != EMPTY_INDEX && ((T) content[v_index]).compareTo((T) content[v_parent]) < 0) {
-			swap(v_index, v_parent);
-			v_index = v_parent;
-			v_parent = parent(v_index);
-		}
+	private void upHeap(final int index) {
+		for (int curr = index, par = parent(curr); par != EMPTY_INDEX && ((T) content[curr]).compareTo((T) content[par]) < 0; curr = par, par = parent(curr))
+			swap(curr, par);
 	}
 
 	private void downHeap(final int index) {
@@ -102,14 +87,10 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 		if (canDownHeap(index, left_i, right_i)) {
 			// two children
 			if (right_i != EMPTY_INDEX) {
-				// left child is smaller
-				if (((T) content[left_i]).compareTo((T) content[right_i]) < 0) {
-					swap(left_i, index);
-					downHeap(left_i);
-				} else {
-					swap(right_i, index);
-					downHeap(right_i);
-				}
+				// find smaller child
+				final int target = ((T) content[left_i]).compareTo((T) content[right_i]) < 0 ? left_i : right_i;
+				swap(target, index);
+				downHeap(target);
 			} else {
 				// just the left child
 				swap(left_i, index);
@@ -119,8 +100,8 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
 	private boolean canDownHeap(final int index, final int left, final int right) {
 		return validIndex(index) && validIndex(left) &&
-				(((T) content[left]).compareTo((T) content[index]) < 0 ||
-						validIndex(right) && ((T) content[right]).compareTo((T) content[index]) < 0);
+				       (((T) content[left]).compareTo((T) content[index]) < 0 ||
+						        validIndex(right) && ((T) content[right]).compareTo((T) content[index]) < 0);
 	}
 
 	private int parent(final int index) {
@@ -129,17 +110,35 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 	}
 
 	private int leftChild(final int index) {
-		return 1 <= index && index * 2 <= size() ? index * 2 : EMPTY_INDEX;
+		final int left = index * 2;
+		return 1 <= index && left <= size() ? left : EMPTY_INDEX;
 	}
 
 	private int rightChild(final int index) {
-		return 1 <= index && index * 2 + 1 <= size() ? index * 2 + 1 : EMPTY_INDEX;
+		final int right = index * 2 + 1;
+		return 1 <= index && right <= size() ? right : EMPTY_INDEX;
 	}
 
 	private void swap(final int from, final int to) {
 		final Object temp = content[from];
 		content[from] = content[to];
 		content[to] = temp;
+	}
+
+	private void toString(final String prefix, final boolean isTail, final StringBuilder sb, final int index) {
+		final int right = rightChild(index), left = leftChild(index);
+		if (right != EMPTY_INDEX)
+			toString(prefix + (isTail ? "│   " : "    "), false, sb, right);
+		sb.append(prefix).append(isTail ? "└── " : "┌── ").append(content[index]).append("\n");
+		if (left != EMPTY_INDEX)
+			toString(prefix + (isTail ? "    " : "│   "), true, sb, left);
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder s = new StringBuilder();
+		toString("", true, s, MIN_INDEX);
+		return s.toString();
 	}
 
 }
