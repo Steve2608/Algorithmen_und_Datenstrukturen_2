@@ -24,7 +24,7 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
         content = list;
         size = content.length;
-        for (int i = content.length - 1; i >= 0; i--)
+        for (int i = content.length / 2 - 1; i >= 0; i--)
             downHeap(i);
     }
 
@@ -112,7 +112,6 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
     @Override
     public Object[] toArray() {
-        // excluding the first (null) Element.
         final Object[] obj = new Object[size()];
         System.arraycopy(content, MIN_INDEX, obj, 0, size());
         return obj;
