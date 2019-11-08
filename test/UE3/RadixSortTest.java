@@ -43,11 +43,6 @@ class RadixSortTest {
     }
 
     @Test
-    void negativeValues() {
-        assertThrows(IllegalArgumentException.class, () -> RadixSort.sort(new Integer[]{5, 7, -3}));
-    }
-
-    @Test
     void link() {
         final MyLinkedList l1 = new MyLinkedList(), l2 = new MyLinkedList();
         l1.add(3);
