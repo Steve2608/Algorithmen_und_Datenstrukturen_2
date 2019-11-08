@@ -124,12 +124,12 @@ class MinHeapTest {
         assertThrows(IllegalArgumentException.class, () -> MinHeap.sort(new Long[]{1L, 2L, null}));
 
         final Long l1 = 1L, l7 = 7L, l9 = 9L, l2 = 2L, l5 = 5L;
-        final Long[] sorted = MinHeap.sort(new Long[]{l1, l7, l9, l2, l5});
+        final Long[] sorted = {l9, l7, l5, l2, l1};
+        final Long[] toSort = {l1, l7, l9, l2, l5};
+        MinHeap.sort(toSort);
 
-        assertSame(l9, sorted[0]);
-        assertSame(l7, sorted[1]);
-        assertSame(l5, sorted[2]);
-        assertSame(l2, sorted[3]);
-        assertSame(l1, sorted[4]);
+        for (int i = 0; i < sorted.length; i++) {
+            assertSame(sorted[i], toSort[i]);
+        }
     }
 }

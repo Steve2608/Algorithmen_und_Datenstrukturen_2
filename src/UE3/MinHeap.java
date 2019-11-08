@@ -28,7 +28,7 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
             downHeap(i);
     }
 
-    public static <T extends Comparable<T>> T[] sort(final T[] list) {
+    public static <T extends Comparable<T>> void sort(final T[] list) {
         if (list == null) throw new IllegalArgumentException("List must not be null!");
         for (final T t : list) {
             if (t == null)
@@ -38,7 +38,6 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
         final MinHeap<T> heap = new MinHeap<>(list);
         for (int i = list.length - 1; i >= 0; i--)
             list[i] = heap.removeMin();
-        return list;
     }
 
     private int last() {
