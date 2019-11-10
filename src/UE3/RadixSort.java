@@ -11,7 +11,7 @@ public class RadixSort {
 
     private static int BASE = 10;
 
-    public static MyLinkedList sort(final Integer[] list) {
+	public synchronized static MyLinkedList sort(final Integer[] list) {
         if (list == null) throw new IllegalArgumentException("List must not be null!");
         for (final Integer i : list) {
             if (i == null) throw new IllegalArgumentException("Values must not be null!");
@@ -72,11 +72,11 @@ public class RadixSort {
                 () -> new IllegalArgumentException("No max element present"));
     }
 
-    public static int getBase() {
+	public synchronized static int getBase() {
         return BASE;
     }
 
-    public static int setBase(final int base) {
+	public synchronized static int setBase(final int base) {
         if (base > 1) BASE = base;
         return BASE;
     }
