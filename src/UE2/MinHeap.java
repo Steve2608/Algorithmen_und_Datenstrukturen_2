@@ -51,7 +51,7 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 		if (isEmpty())
 			throw new NoSuchElementException("There is no min element to be removed");
 
-        swap(MIN_INDEX, size());
+		swap(MIN_INDEX, size());
 		final T ret = (T) content[size()];
 		content[size--] = null;
 		downHeap(MIN_INDEX);
@@ -73,7 +73,7 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 	public Object[] toArray() {
 		// excluding the first (null) Element.
 		final Object[] obj = new Object[size()];
-        System.arraycopy(content, MIN_INDEX, obj, 0, size());
+		System.arraycopy(content, MIN_INDEX, obj, 0, size());
 		return obj;
 	}
 
@@ -100,23 +100,23 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
 	private boolean canDownHeap(final int index, final int left, final int right) {
 		return validIndex(index) && validIndex(left) &&
-				       (((T) content[left]).compareTo((T) content[index]) < 0 ||
-						        validIndex(right) && ((T) content[right]).compareTo((T) content[index]) < 0);
+				(((T) content[left]).compareTo((T) content[index]) < 0 ||
+						validIndex(right) && ((T) content[right]).compareTo((T) content[index]) < 0);
 	}
 
 	private int parent(final int index) {
 		// odd numbers do not matter (Integer Division!)
-        return MIN_INDEX < index && index <= size() ? index / 2 : EMPTY_INDEX;
+		return MIN_INDEX < index && index <= size() ? index / 2 : EMPTY_INDEX;
 	}
 
 	private int leftChild(final int index) {
 		final int left = index * 2;
-        return MIN_INDEX <= index && left <= size() ? left : EMPTY_INDEX;
+		return MIN_INDEX <= index && left <= size() ? left : EMPTY_INDEX;
 	}
 
 	private int rightChild(final int index) {
 		final int right = index * 2 + 1;
-        return MIN_INDEX <= index && right <= size() ? right : EMPTY_INDEX;
+		return MIN_INDEX <= index && right <= size() ? right : EMPTY_INDEX;
 	}
 
 	private void swap(final int from, final int to) {
