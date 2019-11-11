@@ -1,10 +1,10 @@
-package UE2;
+package UE3;
 
 import java.util.NoSuchElementException;
 
 public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
-	private static final int MIN_INDEX = 1, EMPTY_INDEX = -1;
+	private static final int MIN_INDEX = 0, EMPTY_INDEX = -1;
 
 	private Object[] content;
 	private int size;
@@ -12,7 +12,36 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 	public MinHeap(final int capacity) {
 		if (capacity <= 0)
 			throw new IllegalArgumentException("Capacity must be positive: " + capacity);
-		content = new Object[capacity + 1];
+		content = new Object[capacity];
+	}
+
+	public MinHeap(final T[] list) {
+		if (list == null) throw new IllegalArgumentException("List must not be null!");
+		for (final T t : list) {
+			if (t == null)
+				throw new IllegalArgumentException("List must not contain null elements!");
+		}
+
+		content = list;
+		size = content.length;
+		for (int i = content.length / 2 - 1; i >= 0; i--)
+			downHeap(i);
+	}
+
+	public static <T extends Comparable<T>> void sort(final T[] list) {
+		if (list == null) throw new IllegalArgumentException("List must not be null!");
+		for (final T t : list) {
+			if (t == null)
+				throw new IllegalArgumentException("List must not contain null elements!");
+		}
+
+		final MinHeap<T> heap = new MinHeap<>(list);
+		for (int i = list.length - 1; i >= 0; i--)
+			list[i] = heap.removeMin();
+	}
+
+	private int last() {
+		return size() - 1;
 	}
 
 	@Override
@@ -31,15 +60,15 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 			throw new IllegalArgumentException("Cannot add a null value");
 		if (size() >= content.length - 1) doubleSize();
 
-		content[++size] = val; // index 0 left blank
-		upHeap(size());
+		content[size++] = val;
+		upHeap(last());
 	}
 
 	private void doubleSize() {
 		final Object[] copy = content;
 		// remember to keep one blank field
 		content = new Object[content.length * 2];
-		System.arraycopy(copy, MIN_INDEX, content, MIN_INDEX, copy.length - 1);
+		System.arraycopy(copy, MIN_INDEX, content, MIN_INDEX, copy.length);
 	}
 
 	private boolean validIndex(final int index) {
@@ -51,9 +80,9 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 		if (isEmpty())
 			throw new NoSuchElementException("There is no min element to be removed");
 
-		swap(MIN_INDEX, size());
-		final T ret = (T) content[size()];
-		content[size--] = null;
+		swap(MIN_INDEX, last());
+		final T ret = (T) content[last()];
+		content[--size] = null;
 		downHeap(MIN_INDEX);
 		return ret;
 	}
@@ -65,13 +94,24 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 		return (T) content[MIN_INDEX];
 	}
 
+	public boolean contains(final T val) {
+		if (val == null) throw new IllegalArgumentException("Cannot search for null values");
+		return contains(val, 0);
+	}
+
+	private boolean contains(final T val, final int i) {
+		if (i > last() || ((T) content[i]).compareTo(val) > 0) return false;
+		if (content[i].equals(val)) return true;
+
+		return contains(val, leftChild(i)) || contains(val, rightChild(i));
+	}
+
 	public T get(final int index) {
 		return validIndex(index) ? (T) content[index] : null;
 	}
 
 	@Override
 	public Object[] toArray() {
-		// excluding the first (null) Element.
 		final Object[] obj = new Object[size()];
 		System.arraycopy(content, MIN_INDEX, obj, 0, size());
 		return obj;
@@ -106,17 +146,17 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
 	private int parent(final int index) {
 		// odd numbers do not matter (Integer Division!)
-		return MIN_INDEX < index && index <= size() ? index / 2 : EMPTY_INDEX;
+		return MIN_INDEX < index && index <= last() ? (index - 1) / 2 : EMPTY_INDEX;
 	}
 
 	private int leftChild(final int index) {
-		final int left = index * 2;
-		return MIN_INDEX <= index && left <= size() ? left : EMPTY_INDEX;
+		final int left = index * 2 + 1;
+		return MIN_INDEX <= index && left <= last() ? left : EMPTY_INDEX;
 	}
 
 	private int rightChild(final int index) {
-		final int right = index * 2 + 1;
-		return MIN_INDEX <= index && right <= size() ? right : EMPTY_INDEX;
+		final int right = (index + 1) * 2;
+		return MIN_INDEX <= index && right <= last() ? right : EMPTY_INDEX;
 	}
 
 	private void swap(final int from, final int to) {
