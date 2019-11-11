@@ -16,28 +16,26 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 	}
 
 	public MinHeap(final T[] list) {
-		if (list == null) throw new IllegalArgumentException("List must not be null!");
-		for (final T t : list) {
-			if (t == null)
-				throw new IllegalArgumentException("List must not contain null elements!");
-		}
+		arrayCheck(list);
 
 		content = list;
 		size = content.length;
-		for (int i = content.length / 2 - 1; i >= 0; i--)
+		for (int i = parent(last()); i >= 0; i--)
 			downHeap(i);
 	}
 
 	public static <T extends Comparable<T>> void sort(final T[] list) {
+		final MinHeap<T> heap = new MinHeap<>(list);
+		for (int i = list.length - 1; i >= 0; i--)
+			list[i] = heap.removeMin();
+	}
+
+	private void arrayCheck(final T[] list) {
 		if (list == null) throw new IllegalArgumentException("List must not be null!");
 		for (final T t : list) {
 			if (t == null)
 				throw new IllegalArgumentException("List must not contain null elements!");
 		}
-
-		final MinHeap<T> heap = new MinHeap<>(list);
-		for (int i = list.length - 1; i >= 0; i--)
-			list[i] = heap.removeMin();
 	}
 
 	private int last() {
@@ -56,8 +54,7 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
 	@Override
 	public void insert(final T val) throws IllegalArgumentException {
-		if (val == null)
-			throw new IllegalArgumentException("Cannot add a null value");
+		if (val == null) throw new IllegalArgumentException("Cannot add a null value");
 		if (size() >= content.length - 1) doubleSize();
 
 		content[size++] = val;
@@ -77,8 +74,7 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
 	@Override
 	public T removeMin() throws NoSuchElementException {
-		if (isEmpty())
-			throw new NoSuchElementException("There is no min element to be removed");
+		if (isEmpty()) throw new NoSuchElementException("There is no min element to be removed");
 
 		swap(MIN_INDEX, last());
 		final T ret = (T) content[last()];
@@ -89,8 +85,7 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
 	@Override
 	public T min() throws NoSuchElementException {
-		if (isEmpty())
-			throw new NoSuchElementException("There is no min Element");
+		if (isEmpty()) throw new NoSuchElementException("There is no min Element");
 		return (T) content[MIN_INDEX];
 	}
 
