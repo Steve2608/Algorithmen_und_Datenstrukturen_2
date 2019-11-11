@@ -2,7 +2,7 @@ package UE4;
 
 public class BinaryTree implements BinarySearchTree {
 
-	private BinaryTreeNode root;
+	protected BinaryTreeNode root;
 	private int size = 0;
 
 	@Override
