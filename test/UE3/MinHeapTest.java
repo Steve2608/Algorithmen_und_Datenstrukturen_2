@@ -31,7 +31,7 @@ class MinHeapTest {
     }
 
     @Test
-    void isEmpty() {
+    void testIsEmpty() {
         assertFalse(heap.isEmpty());
 
         heap.removeMin();
@@ -44,7 +44,7 @@ class MinHeapTest {
     }
 
     @Test
-    void size() {
+    void testSize() {
         assertEquals(3, heap.size());
         heap.removeMin();
         assertEquals(2, heap.size());
@@ -55,7 +55,7 @@ class MinHeapTest {
     }
 
     @Test
-    void insert() {
+    void testInsert() {
         heap.insert(15L);
         assertArrayEquals(new Long[]{7L, 11L, 9L, 15L}, heap.toArray());
 
@@ -67,7 +67,7 @@ class MinHeapTest {
     }
 
     @Test
-    void removeMin() {
+    void testRemoveMin() {
         System.out.println(heap);
         assertEquals(7L, heap.removeMin());
         assertEquals(9L, heap.removeMin());
@@ -77,7 +77,7 @@ class MinHeapTest {
     }
 
     @Test
-    void min() {
+    void testMin() {
         assertEquals(7L, heap.min());
 
         heap.removeMin();
@@ -88,7 +88,7 @@ class MinHeapTest {
     }
 
     @Test
-    void toArray() {
+    void testToArray() {
         assertArrayEquals(new Long[]{7L, 11L, 9L}, heap.toArray());
 
         heap.removeMin();
@@ -99,7 +99,7 @@ class MinHeapTest {
     }
 
     @Test
-    void contains() {
+    void testContains() {
         assertTrue(heap.contains(9L));
         assertTrue(heap.contains(11L));
         assertTrue(heap.contains(7L));
@@ -112,7 +112,7 @@ class MinHeapTest {
     }
 
     @Test
-    void constructor() {
+    void testConstructor() {
         assertThrows(IllegalArgumentException.class, () -> new MinHeap<>(null));
         assertThrows(IllegalArgumentException.class, () -> new MinHeap<>(new Long[]{1L, 2L, null}));
 
@@ -148,7 +148,7 @@ class MinHeapTest {
     }
 
     @Test
-    void vorlesungsFolien() {
+    void testVorlesungsFolien() {
         final Long[] longs = {16L, 5L, 4L, 12L, 6L, 7L, 23L, 20L, 25L, 5L, 11L, 27L, 9L, 8L};
         final MinHeap<Long> heap = new MinHeap<>(longs);
 
@@ -167,7 +167,7 @@ class MinHeapTest {
     }
 
     @Test
-    void sort() {
+    void testSort() {
         assertThrows(IllegalArgumentException.class, () -> MinHeap.sort(null));
         assertThrows(IllegalArgumentException.class, () -> MinHeap.sort(new Long[]{1L, 2L, null}));
 

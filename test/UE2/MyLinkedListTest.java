@@ -20,7 +20,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void size() {
+	void testSize() {
 		assertEquals(3, list.size());
 		list.clear();
 		assertEquals(0, list.size());
@@ -30,7 +30,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void addFirst() {
+	void testAddFirst() {
 		assertThrows(IllegalArgumentException.class, () -> list.addFirst(null));
 
 		assertEquals(6L, list.get(0));
@@ -39,7 +39,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void addLast() {
+	void testAddLast() {
 		assertThrows(IllegalArgumentException.class, () -> list.addLast(null));
 
 		assertEquals(4L, list.get(list.size() - 1));
@@ -48,7 +48,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void addSorted() {
+	void testAddSorted() {
 		assertThrows(IllegalArgumentException.class, () -> list.addSorted(null));
 
 		list.addSorted(8L);
@@ -58,7 +58,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void sortASC() {
+	void testSortASC() {
 		list.addFirst(1234L);
 		list.addLast(34L);
 		list.addLast(12L);
@@ -71,7 +71,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void sortDES() {
+	void testSortDES() {
 		list.addFirst(1234L);
 		list.addLast(34L);
 		list.addLast(12L);
@@ -84,7 +84,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void clear() {
+	void testClear() {
 		assertEquals(3, list.size());
 		list.clear();
 
@@ -97,7 +97,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void removeFirst() {
+	void testRemoveFirst() {
 		assertEquals(6L, list.removeFirst());
 		assertEquals(2, list.size());
 
@@ -114,7 +114,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void removeLast() {
+	void testRemoveLast() {
 		assertEquals(4L, list.removeLast());
 		assertEquals(2, list.size());
 
@@ -131,7 +131,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void getFirst() {
+	void testGetFirst() {
 		assertEquals(6L, list.getFirst());
 
 		list.addFirst(5L);
@@ -139,7 +139,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void getLast() {
+	void testGetLast() {
 		assertEquals(4L, list.getLast());
 
 		list.addLast(5L);
@@ -147,7 +147,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void contains() {
+	void testContains() {
 		assertThrows(IllegalArgumentException.class, () -> list.contains(null));
 
 		assertTrue(list.contains(4L));
@@ -155,21 +155,21 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void get() {
+	void testGet() {
 		assertEquals(6L, list.get(0));
 		assertEquals(2L, list.get(1));
 		assertEquals(4L, list.get(2));
 	}
 
 	@Test
-	void remove() {
+	void testRemove() {
 		assertEquals(2L, list.remove(1));
 		assertEquals(4L, list.remove(1));
 		assertEquals(6L, list.remove(0));
 	}
 
 	@Test
-	void toArray() {
+	void testToArray() {
 		assertArrayEquals(new Long[]{6L, 2L, 4L}, list.toArray());
 
 		list.clear();
@@ -177,7 +177,7 @@ class MyLinkedListTest {
 	}
 
 	@Test
-	void manyElems() {
+	void testManyElems() {
 		assertTimeout(Duration.ofMillis(500), () -> {
 			for (int i = 0; i < 10_000; i++) {
 				list.addSorted((long) (Math.random() * 1_000_000_000));

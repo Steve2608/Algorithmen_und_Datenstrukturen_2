@@ -20,7 +20,7 @@ class MinHeapTest {
 	}
 
 	@Test
-	void isEmpty() {
+	void testIsEmpty() {
 		assertFalse(heap.isEmpty());
 
 		heap.removeMin();
@@ -33,7 +33,7 @@ class MinHeapTest {
 	}
 
 	@Test
-	void size() {
+	void testSize() {
 		assertEquals(3, heap.size());
 		heap.removeMin();
 		assertEquals(2, heap.size());
@@ -44,7 +44,7 @@ class MinHeapTest {
 	}
 
 	@Test
-	void insert() {
+	void testInsert() {
 		heap.insert(15L);
 		assertArrayEquals(new Long[]{7L, 11L, 9L, 15L}, heap.toArray());
 
@@ -56,7 +56,7 @@ class MinHeapTest {
 	}
 
 	@Test
-	void removeMin() {
+	void testRemoveMin() {
 		assertEquals(7L, heap.removeMin());
 		assertEquals(9L, heap.removeMin());
 		assertEquals(11L, heap.removeMin());
@@ -65,7 +65,7 @@ class MinHeapTest {
 	}
 
 	@Test
-	void min() {
+	void testMin() {
 		assertEquals(7L, heap.min());
 
 		heap.removeMin();
@@ -76,7 +76,7 @@ class MinHeapTest {
 	}
 
 	@Test
-	void toArray() {
+	void testToArray() {
 		assertArrayEquals(new Long[]{7L, 11L, 9L}, heap.toArray());
 
 		heap.removeMin();
