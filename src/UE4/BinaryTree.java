@@ -136,7 +136,6 @@ public class BinaryTree implements BinarySearchTree {
 
 	private void removeTwoChildren(final BinaryTreeNode toRemove) {
 		final BinaryTreeNode parent = getParent(toRemove), nSuccessor = inOrderSuccessor(toRemove);
-		assert nSuccessor != null : "inOrderSuccessor cannot be null";
 		final BinaryTreeNode pSuccessor = getParent(nSuccessor);
 
 		if (toRemove == root) removeRootTwoChildren(nSuccessor, pSuccessor);
@@ -150,12 +149,11 @@ public class BinaryTree implements BinarySearchTree {
 
 		if (pSuccessor == toRemove) {
 			nSuccessor.left = toRemove.left;
-			return;
 		} else {
 			pSuccessor.left = nSuccessor.right;
+			nSuccessor.right = toRemove.right;
+			nSuccessor.left = toRemove.left;
 		}
-		nSuccessor.right = toRemove.right;
-		nSuccessor.left = toRemove.left;
 	}
 
 	private void removeRootTwoChildren(final BinaryTreeNode nSuccessor, final BinaryTreeNode pSuccessor) {
