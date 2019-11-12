@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Helper class for easier debugging of tree
- * Requires <tt>root</tt> in <tt>BinaryTree</tt> to be >= package
+ * TODO set <tt>root</tt> in <tt>BinaryTree</tt> to be >= package
  */
-class DebugTree extends BinaryTree {
+class DebugTree extends MyBinarySearchTree {
 
 	/**
 	 * Checks if references between all children and parents match
@@ -64,7 +64,7 @@ class DebugTree extends BinaryTree {
 		return true;
 	}
 
-	String toString(final BinaryTreeNode node) {
+	private String toString(final BinaryTreeNode node) {
 		return node != null ? String.format("[%d]:\'%s\'", node.key, node.elem) : null;
 	}
 
@@ -93,7 +93,7 @@ class DebugTree extends BinaryTree {
 
 }
 
-class BinaryTreeTest {
+class MyBinarySearchTreeTest {
 
 	/**
 	 * Number of random trial runs
@@ -126,7 +126,7 @@ class BinaryTreeTest {
 		if (PRINT) System.out.println(tree);
 	}
 
-	private final BinarySearchTree tree = USE_DEBUG_TREE ? new DebugTree() : new BinaryTree();
+	private final BinarySearchTree tree = USE_DEBUG_TREE ? new DebugTree() : new MyBinarySearchTree();
 
 	@Test
 	void testSize() {
@@ -273,7 +273,7 @@ class BinaryTreeTest {
 		final Object[] strings = IntStream.of(1, 3, 0, 11, 7, 18, 12, 29, 5)
 				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArrayPostOrder());
-		assertArrayEquals(new String[0], new BinaryTree().toArrayPostOrder(), "Empty tree must produce empty array");
+		assertArrayEquals(new String[0], new MyBinarySearchTree().toArrayPostOrder(), "Empty tree must produce empty array");
 	}
 
 	@Test
@@ -281,7 +281,7 @@ class BinaryTreeTest {
 		final Object[] strings = IntStream.of(0, 1, 3, 5, 7, 11, 12, 18, 29)
 				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArrayInOrder());
-		assertArrayEquals(new String[0], new BinaryTree().toArrayInOrder(), "Empty tree must produce empty array");
+		assertArrayEquals(new String[0], new MyBinarySearchTree().toArrayInOrder(), "Empty tree must produce empty array");
 	}
 
 	@Test
@@ -289,7 +289,7 @@ class BinaryTreeTest {
 		final Object[] strings = IntStream.of(5, 0, 3, 1, 29, 12, 7, 11, 18)
 				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArrayPreOrder());
-		assertArrayEquals(new String[0], new BinaryTree().toArrayPreOrder(), "Empty tree must produce empty array");
+		assertArrayEquals(new String[0], new MyBinarySearchTree().toArrayPreOrder(), "Empty tree must produce empty array");
 	}
 
 	@Test

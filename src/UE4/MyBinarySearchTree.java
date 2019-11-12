@@ -1,6 +1,6 @@
 package UE4;
 
-public class BinaryTree implements BinarySearchTree {
+public class MyBinarySearchTree implements BinarySearchTree {
 
 	protected BinaryTreeNode root;
 	private int size = 0;
