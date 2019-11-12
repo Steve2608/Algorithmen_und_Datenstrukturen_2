@@ -2,11 +2,11 @@ package UE4;
 
 public interface BinarySearchTree {
 
-	boolean insert(Long elem) throws IllegalArgumentException;
+	boolean insert(Integer key, String elem) throws IllegalArgumentException;
 
-	Long find(Long key) throws IllegalArgumentException;
+	String find(Integer key) throws IllegalArgumentException;
 
-	boolean remove(Long key) throws IllegalArgumentException;
+	boolean remove(Integer key) throws IllegalArgumentException;
 
 	int size();
 
@@ -16,12 +16,12 @@ public interface BinarySearchTree {
 
 	Object[] toArrayPreOrder();
 
-	Long getParent(Long key) throws IllegalArgumentException;
+	Integer getParent(Integer key) throws IllegalArgumentException;
 
-	boolean isRoot(Long key) throws IllegalArgumentException;
+	boolean isRoot(Integer key) throws IllegalArgumentException;
 
-	boolean isInternal(Long key) throws IllegalArgumentException;
+	boolean isInternal(Integer key) throws IllegalArgumentException;
 
-	boolean isExternal(Long key) throws IllegalArgumentException;
+	boolean isExternal(Integer key) throws IllegalArgumentException;
 }
 
