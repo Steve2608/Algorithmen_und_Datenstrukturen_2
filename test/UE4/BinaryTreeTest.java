@@ -3,7 +3,6 @@ package UE4;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Objects;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -65,12 +64,16 @@ class DebugTree extends BinaryTree {
 		return true;
 	}
 
+	String toString(final BinaryTreeNode node) {
+		return node != null ? String.format("[%d]:\'%s\'", node.key, node.elem) : null;
+	}
+
 	private void toString(final String prefix, final boolean isTail, final StringBuilder sb,
 	                      final BinaryTreeNode node) {
 		if (node != null) {
 			if (node.right != null)
 				toString(prefix + (isTail ? "│   " : "    "), false, sb, node.right);
-			sb.append(prefix).append(isTail ? "└── " : "┌── ").append(node).append("\n");
+			sb.append(prefix).append(isTail ? "└── " : "┌── ").append(toString(node)).append("\n");
 			if (node.left != null)
 				toString(prefix + (isTail ? "    " : "│   "), true, sb, node.left);
 		}
@@ -92,38 +95,57 @@ class DebugTree extends BinaryTree {
 
 class BinaryTreeTest {
 
-	private static final int N_TRIALS = 100_000, BOUND = N_TRIALS / 1_000;
-	private static final boolean PRINT_TREE = true, USE_DEBUG_TREE = true, PRINT_DEBUG = false;
-
-	private final BinarySearchTree tree = USE_DEBUG_TREE ? new DebugTree() : new BinaryTree();
+	/**
+	 * Number of random trial runs
+	 */
+	private static final int N_TRIALS = 100_000;
+	/**
+	 * Highest value a key can take (exclusive)
+	 */
+	private static final int MAX_KEY = N_TRIALS / 1_000;
+	/**
+	 * Print tree after each change in all tests but <tt>testRandomOperations</tt>
+	 */
+	private static final boolean PRINT = true;
+	/**
+	 * Use Debug Tree in all tests and assert correctness in <tt>testRandomOperations</tt>
+	 */
+	private static final boolean USE_DEBUG_TREE = true;
+	/**
+	 * Print debug information in <tt>testRandomOperations</tt>
+	 * Caution: Will slow down test considerably (~80 times slower on my machine)
+	 */
+	private static final boolean PRINT_DEBUG = false;
 
 	@BeforeEach
 	void setUp() {
 		final int[] values = {5, 29, 12, 0, 3, 7, 18, 18, 11, 1};
 		for (final int elem : values) {
-			tree.insert(elem, String.valueOf(Objects.hashCode(elem)));
+			tree.insert(elem, String.valueOf(-elem));
 		}
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 	}
+
+	private final BinarySearchTree tree = USE_DEBUG_TREE ? new DebugTree() : new BinaryTree();
 
 	@Test
 	void testSize() {
 		assertEquals(9, tree.size());
 
-		tree.insert(12, String.valueOf(Objects.hashCode(12)));
-		if (PRINT_TREE) System.out.println(tree);
+		tree.insert(12, String.valueOf(-12));
+		if (PRINT) System.out.println(tree);
 		assertEquals(9, tree.size(), "Size must change when trying to insert duplicate value");
 
-		tree.insert(2, String.valueOf(Objects.hashCode(2)));
-		if (PRINT_TREE) System.out.println(tree);
+		tree.insert(2, String.valueOf(-2));
+		if (PRINT) System.out.println(tree);
 		assertEquals(10, tree.size(), "Size was not updated upon insert");
 
 		tree.remove(11);
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertEquals(9, tree.size(), "Size was not updated upon remove");
 
 		tree.remove(11);
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertEquals(9, tree.size(), "Size must not change upon removal of not-contained element");
 	}
 
@@ -134,7 +156,7 @@ class BinaryTreeTest {
 		assertTrue(tree.isRoot(5), "Root was not detected as such");
 
 		tree.remove(5);
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertTrue(tree.isRoot(7), "Root was not updated correctly");
 
 		assertFalse(tree.isRoot(5), "Not-present element cannot be root");
@@ -152,11 +174,11 @@ class BinaryTreeTest {
 		assertFalse(tree.isInternal(24352345), "Non-present element cannot be internal");
 
 		tree.remove(11);
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertFalse(tree.isInternal(7), "Node was detected as internal after remove");
 
-		tree.insert(15, String.valueOf(Objects.hashCode(15)));
-		if (PRINT_TREE) System.out.println(tree);
+		tree.insert(15, String.valueOf(-15));
+		if (PRINT) System.out.println(tree);
 		assertTrue(tree.isInternal(18), "Node was not detected as internal after insert");
 		assertFalse(tree.isInternal(15), "Newly added Node was detected as internal");
 	}
@@ -171,13 +193,31 @@ class BinaryTreeTest {
 		assertFalse(tree.isExternal(24352345), "Non-present element cannot be external");
 
 		tree.remove(11);
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertTrue(tree.isExternal(7), "New external Node after removal was not detected");
 
-		tree.insert(15, String.valueOf(Objects.hashCode(15)));
-		if (PRINT_TREE) System.out.println(tree);
+		tree.insert(15, String.valueOf(-15));
+		if (PRINT) System.out.println(tree);
 		assertTrue(tree.isExternal(15), "Newly added Node was not detected as external");
 		assertFalse(tree.isExternal(18), "Node was detected as external after insert");
+	}
+
+	@Test
+	void testInsert() {
+		assertThrows(IllegalArgumentException.class, () -> tree.insert(null, "Lol"),
+				"IllegalArgumentException must be thrown on empty key");
+		assertThrows(IllegalArgumentException.class, () -> tree.insert(2324, null),
+				"IllegalArgumentException must be thrown on empty element");
+		assertThrows(IllegalArgumentException.class, () -> tree.insert(null, null),
+				"IllegalArgumentException must be thrown if both key and element are null");
+
+		assertTrue(tree.insert(1231, String.valueOf(-1231)), "New element was not inserted");
+		if (PRINT) System.out.println(tree);
+		assertFalse(tree.insert(1231, String.valueOf(-1231)), "Duplicated element must not be inserted again");
+
+		assertTrue(tree.insert(6, String.valueOf(-6)), "New element was not inserted");
+		if (PRINT) System.out.println(tree);
+		assertEquals(7, tree.getParent(6), "Node was not inserted at the correct position");
 	}
 
 	@Test
@@ -191,27 +231,21 @@ class BinaryTreeTest {
 	}
 
 	@Test
-	void testInsert() {
-		assertThrows(IllegalArgumentException.class, () -> tree.insert(null, "Lol"),
-				"IllegalArgumentException must be thrown on empty key");
-		assertThrows(IllegalArgumentException.class, () -> tree.insert(2324, null),
-				"IllegalArgumentException must be thrown on empty element");
-
-		assertTrue(tree.insert(1231, String.valueOf(Objects.hashCode(1231))), "New element was not inserted");
-		if (PRINT_TREE) System.out.println(tree);
-		assertFalse(tree.insert(1231, String.valueOf(Objects.hashCode(1231))), "Duplicated element must not be inserted again");
-
-		assertTrue(tree.insert(6, String.valueOf(Objects.hashCode(6))), "New element was not inserted");
-		if (PRINT_TREE) System.out.println(tree);
-		assertEquals(7, tree.getParent(6), "Node was not inserted at the correct position");
-	}
-
-	@Test
 	void testFind() {
 		assertThrows(IllegalArgumentException.class, () -> tree.find(null),
 				"IllegalArgumentException must be thrown on empty element");
 
-		// TODO dumb case
+		assertEquals("-7", tree.find(7), "Contained element was not found");
+		assertEquals("-5", tree.find(5), "Contained element was not found");
+		assertNull(tree.find(-10), "Not contained element was found");
+
+		tree.remove(7);
+		if (PRINT) System.out.println(tree);
+		assertNull(tree.find(7), "Key must not be found after removal");
+
+		tree.insert(-10, String.valueOf(10));
+		if (PRINT) System.out.println(tree);
+		assertEquals("10", tree.find(-10), "Key not found after insert");
 	}
 
 	@Test
@@ -220,24 +254,24 @@ class BinaryTreeTest {
 				"IllegalArgumentException must be thrown on empty element");
 
 		assertTrue(tree.remove(1), "Element with no children was not removed");
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertTrue(tree.remove(7), "Element with one child was not removed");
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertTrue(tree.remove(12), "Element with two children was not removed");
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertTrue(tree.remove(5), "Root with two children was not removed");
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		assertFalse(tree.remove(5), "Cannot remove non-contained Node");
-		if (PRINT_TREE) System.out.println(tree);
+		if (PRINT) System.out.println(tree);
 		final Object[] strings = IntStream.of(0, 3, 11, 18, 29)
-				.mapToObj(i -> String.valueOf(Objects.hashCode(i))).toArray();
+				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArrayInOrder(), "Structure of tree was violated");
 	}
 
 	@Test
 	void testToArrayPostOrder() {
 		final Object[] strings = IntStream.of(1, 3, 0, 11, 7, 18, 12, 29, 5)
-				.mapToObj(i -> String.valueOf(Objects.hashCode(i))).toArray();
+				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArrayPostOrder());
 		assertArrayEquals(new String[0], new BinaryTree().toArrayPostOrder(), "Empty tree must produce empty array");
 	}
@@ -245,7 +279,7 @@ class BinaryTreeTest {
 	@Test
 	void testToArrayInOrder() {
 		final Object[] strings = IntStream.of(0, 1, 3, 5, 7, 11, 12, 18, 29)
-				.mapToObj(i -> String.valueOf(Objects.hashCode(i))).toArray();
+				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArrayInOrder());
 		assertArrayEquals(new String[0], new BinaryTree().toArrayInOrder(), "Empty tree must produce empty array");
 	}
@@ -253,7 +287,7 @@ class BinaryTreeTest {
 	@Test
 	void testToArrayPreOrder() {
 		final Object[] strings = IntStream.of(5, 0, 3, 1, 29, 12, 7, 11, 18)
-				.mapToObj(i -> String.valueOf(Objects.hashCode(i))).toArray();
+				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArrayPreOrder());
 		assertArrayEquals(new String[0], new BinaryTree().toArrayPreOrder(), "Empty tree must produce empty array");
 	}
@@ -261,18 +295,17 @@ class BinaryTreeTest {
 	@Test
 	void testRandomOperations() {
 		final Random r = new Random(12);
-		final DebugTree debug = (DebugTree) tree;
 		final RandomChoice[] operations = RandomChoice.values();
 
 		int size = tree.size();
 		for (int i = 0; i < N_TRIALS; i++) {
-			final int choice = r.nextInt(operations.length);
-			final int k = r.nextInt(BOUND);
-			if (PRINT_DEBUG) {
-				System.out.println(String.format("[i:%d, c:%s, k:%d]", i, operations[choice], k));
-				if (PRINT_TREE) System.out.println(tree);
-			}
-			switch (operations[choice]) {
+			final RandomChoice choice = operations[r.nextInt(operations.length)];
+			final int k = r.nextInt(MAX_KEY);
+
+			if (PRINT) System.out.println(String.format("[i:%d, c:%s, k:%d]", i, choice, k));
+			if (PRINT_DEBUG) System.out.println(tree);
+
+			switch (choice) {
 				case SIZE:
 					assertEquals(size, tree.size(), "Inconsistent size");
 					break;
@@ -297,7 +330,7 @@ class BinaryTreeTest {
 					break;
 				case INSERT:
 					final boolean insert;
-					assertNotEquals(tree.find(k), insert = tree.insert(k, String.valueOf(Objects.hashCode(k))),
+					assertNotEquals(tree.find(k), insert = tree.insert(k, String.valueOf(-k)),
 							"If tree contains element, it cannot be inserted and vice versa");
 					if (insert) size++;
 					break;
@@ -320,15 +353,15 @@ class BinaryTreeTest {
 					fail("This case should never be reached");
 			}
 			if (USE_DEBUG_TREE) {
-				final String stru_error = String.format("Tree structure was violated in Iteration %d after option %d", i, choice);
-				assertTrue(debug.isTreeStructure(), stru_error);
-				final String ref_error = String.format("Some pointers are messed up in Iteration %d after option %d", i, choice);
-				assertTrue(debug.checkValidReferences(), ref_error);
+				final DebugTree debug = (DebugTree) tree;
+				assertTrue(debug.isTreeStructure(), "Malformed tree structure");
+				assertTrue(debug.checkValidReferences(), "Messed up pointers");
 			}
 		}
 	}
 
-	private enum RandomChoice {
+	enum RandomChoice {
 		SIZE, INTERNAL_EXTERNAL, PARENT, INSERT, REMOVE, TO_ARRAY
 	}
+
 }
