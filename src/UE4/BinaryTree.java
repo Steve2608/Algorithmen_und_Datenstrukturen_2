@@ -19,9 +19,7 @@ public class BinaryTree implements BinarySearchTree {
 	@Override
 	public boolean isInternal(final Integer key) throws IllegalArgumentException {
 		if (key == null) throw new IllegalArgumentException("Cannot search for null key");
-
-		final BinaryTreeNode node = findNode(key);
-		return node != null && node.hasChildren();
+		return hasChildren(findNode(key));
 	}
 
 	@Override
@@ -29,7 +27,7 @@ public class BinaryTree implements BinarySearchTree {
 		if (key == null) throw new IllegalArgumentException("Cannot search for null key");
 
 		final BinaryTreeNode node = findNode(key);
-		return node != null && !node.hasChildren();
+		return node != null && !hasChildren(node);
 	}
 
 	@Override
@@ -39,8 +37,18 @@ public class BinaryTree implements BinarySearchTree {
 		final BinaryTreeNode ret = findNode(key);
 		if (ret == null) return null;
 
-		final BinaryTreeNode par = ret.parent;
+		final BinaryTreeNode par = getParent(ret);
 		return par != null ? par.key : null;
+	}
+
+	BinaryTreeNode getParent(final BinaryTreeNode n) {
+		if (n == null || n == root) return null;
+
+		for (BinaryTreeNode curr = root; curr != null; ) {
+			if (curr.left == n || curr.right == n) return curr;
+			curr = n.key.compareTo(curr.key) < 0 ? curr.left : curr.right;
+		}
+		return null;
 	}
 
 	@Override
@@ -56,7 +64,6 @@ public class BinaryTree implements BinarySearchTree {
 			final BinaryTreeNode insert = new BinaryTreeNode(key, elem);
 			if (key.compareTo(parent.key) < 0) parent.left = insert;
 			else parent.right = insert;
-			insert.parent = parent;
 		}
 		size++;
 		return true;
@@ -64,7 +71,7 @@ public class BinaryTree implements BinarySearchTree {
 
 	private BinaryTreeNode findInsert(final Integer elem) {
 		BinaryTreeNode curr = root;
-		while (curr.hasChildren()) {
+		while (hasChildren(curr)) {
 			if (elem.equals(curr.key)) return null;
 			if (elem.compareTo(curr.key) < 0) {
 				if (curr.left == null) return curr;
@@ -102,78 +109,63 @@ public class BinaryTree implements BinarySearchTree {
 		final BinaryTreeNode toRemove = findNode(key);
 		if (toRemove == null) return false;
 
-		if (!toRemove.hasChildren()) removeZeroChildren(toRemove.parent, toRemove);
-		else if (toRemove.left != null && toRemove.right == null) remove(toRemove.parent, toRemove, toRemove.left);
-		else if (toRemove.left == null && toRemove.right != null) remove(toRemove.parent, toRemove, toRemove.right);
+		final BinaryTreeNode parent = getParent(toRemove);
+		if (!hasChildren(toRemove)) removeZeroChildren(parent, toRemove);
+		else if (toRemove.left != null && toRemove.right == null)
+			remove(parent, toRemove, toRemove.left);
+		else if (toRemove.left == null && toRemove.right != null)
+			remove(parent, toRemove, toRemove.right);
 		else removeTwoChildren(toRemove);
 
 		size--;
 		return true;
 	}
 
+	private boolean hasChildren(final BinaryTreeNode n) {
+		return n != null && (n.left != null || n.right != null);
+	}
+
 	private void remove(final BinaryTreeNode parent, final BinaryTreeNode toRemove, final BinaryTreeNode child) {
 		if (parent == null) {
 			root = child;
-			root.parent = null;
 		} else {
 			if (parent.key.compareTo(toRemove.key) < 0) parent.right = child;
 			else parent.left = child;
-
-			child.parent = parent;
 		}
 	}
 
 	private void removeTwoChildren(final BinaryTreeNode toRemove) {
-		final BinaryTreeNode parent = toRemove.parent, nSuccessor = inOrderSuccessor(toRemove);
+		final BinaryTreeNode parent = getParent(toRemove), nSuccessor = inOrderSuccessor(toRemove);
 		assert nSuccessor != null : "inOrderSuccessor cannot be null";
-		final BinaryTreeNode pSuccessor = nSuccessor.parent;
+		final BinaryTreeNode pSuccessor = getParent(nSuccessor);
 
-		if (toRemove == root) {
-			removeRootTwoChildren(toRemove, nSuccessor, pSuccessor);
-			root.parent = null;
-		} else {
-			removeInternalTwoChildren(toRemove, parent, nSuccessor, pSuccessor);
-		}
+		if (toRemove == root) removeRootTwoChildren(nSuccessor, pSuccessor);
+		else removeInternalTwoChildren(toRemove, parent, nSuccessor, pSuccessor);
 	}
 
 	private void removeInternalTwoChildren(final BinaryTreeNode toRemove, final BinaryTreeNode parent,
 	                                       final BinaryTreeNode nSuccessor, final BinaryTreeNode pSuccessor) {
 		if (parent.left == toRemove) parent.left = nSuccessor;
 		else parent.right = nSuccessor;
-		nSuccessor.parent = parent;
 
 		if (pSuccessor == toRemove) {
 			nSuccessor.left = toRemove.left;
-			toRemove.left.parent = nSuccessor;
 			return;
 		} else {
 			pSuccessor.left = nSuccessor.right;
-			if (nSuccessor.right != null) nSuccessor.right.parent = pSuccessor;
 		}
 		nSuccessor.right = toRemove.right;
-		toRemove.right.parent = nSuccessor;
-
 		nSuccessor.left = toRemove.left;
-		toRemove.left.parent = nSuccessor;
 	}
 
-	private void removeRootTwoChildren(final BinaryTreeNode toRemove, final BinaryTreeNode nSuccessor, final BinaryTreeNode pSuccessor) {
-		if (pSuccessor != toRemove && nSuccessor.right != null) {
-			nSuccessor.right.parent = pSuccessor;
-			pSuccessor.left = nSuccessor;
+	private void removeRootTwoChildren(final BinaryTreeNode nSuccessor, final BinaryTreeNode pSuccessor) {
+		if (nSuccessor == root.right) {
+			nSuccessor.left = root.left;
+		} else {
+			if (pSuccessor != root) pSuccessor.left = nSuccessor.right;
+			nSuccessor.left = root.left;
+			nSuccessor.right = root.right;
 		}
-
-		if (nSuccessor.parent != toRemove) nSuccessor.parent.left = nSuccessor.right;
-
-		if (nSuccessor != toRemove.left) {
-			nSuccessor.left = toRemove.left;
-			toRemove.left.parent = nSuccessor;
-		}
-		if (nSuccessor != toRemove.right) {
-			nSuccessor.right = toRemove.right;
-			toRemove.right.parent = nSuccessor;
-		}
-
 		root = nSuccessor;
 	}
 
@@ -184,10 +176,10 @@ public class BinaryTree implements BinarySearchTree {
 			return successor;
 		}
 
-		BinaryTreeNode p = node.parent, successor = node;
+		BinaryTreeNode p = getParent(node), successor = node;
 		while (p != null && p.right == successor) {
 			successor = p;
-			p = successor.parent;
+			p = getParent(successor);
 		}
 		return p;
 	}

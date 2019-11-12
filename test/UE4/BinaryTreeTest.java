@@ -3,7 +3,6 @@ package UE4;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
 import java.util.Objects;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -25,13 +24,23 @@ class DebugTree extends BinaryTree {
 		return checkValidReferences(root);
 	}
 
+	BinaryTreeNode getParent(final BinaryTreeNode n) {
+		if (n == null || n == root) return null;
+
+		for (BinaryTreeNode curr = root; curr != null; ) {
+			if (curr.left == n || curr.right == n) return curr;
+			curr = n.key.compareTo(curr.key) < 0 ? curr.left : curr.right;
+		}
+		return null;
+	}
+
 	private boolean checkValidReferences(final BinaryTreeNode n) {
 		if (n != null) {
-			final BinaryTreeNode parent = n.parent, left = n.left, right = n.right;
+			final BinaryTreeNode parent = getParent(n), left = n.left, right = n.right;
 			if (parent != null && (parent.left == n && parent.right == n || parent.left != n && parent.right != n))
 				return false;
-			if (left != null && left.parent != n) return false;
-			if (right != null && right.parent != n) return false;
+			if (left != null && getParent(left) != n) return false;
+			if (right != null && getParent(right) != n) return false;
 			return checkValidReferences(left) && checkValidReferences(right);
 		}
 		return true;
@@ -84,7 +93,7 @@ class DebugTree extends BinaryTree {
 class BinaryTreeTest {
 
 	private static final int N_TRIALS = 100_000, BOUND = N_TRIALS / 1_000;
-	private static final boolean PRINT_TREE = true, USE_DEBUG_TREE = true;
+	private static final boolean PRINT_TREE = true, USE_DEBUG_TREE = true, PRINT_DEBUG = false;
 
 	private final BinarySearchTree tree = USE_DEBUG_TREE ? new DebugTree() : new BinaryTree();
 
@@ -253,64 +262,73 @@ class BinaryTreeTest {
 	void testRandomOperations() {
 		final Random r = new Random(12);
 		final DebugTree debug = (DebugTree) tree;
+		final RandomChoice[] operations = RandomChoice.values();
 
-		// takes roughly 70% of the timeout on my weak laptop on battery; should be more than enough
-		assertTimeout(Duration.ofMillis(N_TRIALS / 10), () -> {
-			int size = tree.size();
-			for (int i = 0; i < N_TRIALS; i++) {
-				final int k = r.nextInt(BOUND);
-				switch (r.nextInt(6)) {
-					case 0:
-						assertEquals(size, tree.size(), "Inconsistent size");
-						break;
-					case 1:
-						if (tree.find(k) != null) {
-							assertNotEquals(tree.isInternal(k), tree.isExternal(k),
-									"Node cannot be internal and external at the same time");
-						} else {
-							assertFalse(tree.isInternal(k), "If element is not contained it cannot be internal");
-							assertFalse(tree.isExternal(k), "If element is not contained it cannot be external");
-						}
-						break;
-					case 2:
-						if (tree.find(k) == null)
-							assertNull(tree.getParent(k), "If Node cannot be count it cannot have a parent");
-						else {
-							if (tree.isRoot(k))
-								assertNull(tree.getParent(k), "If Node is root it cannot have a parent");
-							else
-								assertNotNull(tree.getParent(k), "If Node is != root it has to have a parent");
-						}
-						break;
-					case 3:
-						final boolean insert;
-						assertNotEquals(tree.find(k), insert = tree.insert(k, String.valueOf(Objects.hashCode(k))),
-								"If tree contains element, it cannot be inserted and vice versa");
-						if (insert) size++;
-						break;
-					case 4:
-						final boolean remove;
-						assertEquals(tree.find(k) != null, remove = tree.remove(k),
-								"If tree contains element, it must be removable and vice versa");
-						if (remove) size--;
-						break;
-					case 5:
-						final Object[] pre = tree.toArrayPreOrder();
-						final Object[] in = tree.toArrayInOrder();
-						final Object[] post = tree.toArrayPostOrder();
-						if (pre.length != post.length || in.length != pre.length) {
-							fail(String.format("Lengths of arrays differed: len(pre)=%d len(in)=%d len(post)=%d",
-									pre.length, in.length, post.length));
-						}
-						break;
-					default:
-						fail("This case should never be reached");
-				}
-				if (USE_DEBUG_TREE) {
-					assertTrue(debug.isTreeStructure(), "Tree structure was violated: \n" + tree);
-					assertTrue(debug.checkValidReferences(), "Some pointers are messed up");
-				}
+		int size = tree.size();
+		for (int i = 0; i < N_TRIALS; i++) {
+			final int choice = r.nextInt(operations.length);
+			final int k = r.nextInt(BOUND);
+			if (PRINT_DEBUG) {
+				System.out.println(String.format("[i:%d, c:%s, k:%d]", i, operations[choice], k));
+				if (PRINT_TREE) System.out.println(tree);
 			}
-		});
+			switch (operations[choice]) {
+				case SIZE:
+					assertEquals(size, tree.size(), "Inconsistent size");
+					break;
+				case INTERNAL_EXTERNAL:
+					if (tree.find(k) != null) {
+						assertNotEquals(tree.isInternal(k), tree.isExternal(k),
+								"Node cannot be internal and external at the same time");
+					} else {
+						assertFalse(tree.isInternal(k), "If element is not contained it cannot be internal");
+						assertFalse(tree.isExternal(k), "If element is not contained it cannot be external");
+					}
+					break;
+				case PARENT:
+					if (tree.find(k) == null)
+						assertNull(tree.getParent(k), "If Node cannot be count it cannot have a parent");
+					else {
+						if (tree.isRoot(k))
+							assertNull(tree.getParent(k), "If Node is root it cannot have a parent");
+						else
+							assertNotNull(tree.getParent(k), "If Node is != root it has to have a parent");
+					}
+					break;
+				case INSERT:
+					final boolean insert;
+					assertNotEquals(tree.find(k), insert = tree.insert(k, String.valueOf(Objects.hashCode(k))),
+							"If tree contains element, it cannot be inserted and vice versa");
+					if (insert) size++;
+					break;
+				case REMOVE:
+					final boolean remove;
+					assertEquals(tree.find(k) != null, remove = tree.remove(k),
+							"If tree contains element, it must be removable and vice versa");
+					if (remove) size--;
+					break;
+				case TO_ARRAY:
+					final Object[] pre = tree.toArrayPreOrder();
+					final Object[] in = tree.toArrayInOrder();
+					final Object[] post = tree.toArrayPostOrder();
+					if (pre.length != post.length || in.length != pre.length) {
+						fail(String.format("Lengths of arrays differed: len(pre)=%d len(in)=%d len(post)=%d",
+								pre.length, in.length, post.length));
+					}
+					break;
+				default:
+					fail("This case should never be reached");
+			}
+			if (USE_DEBUG_TREE) {
+				final String stru_error = String.format("Tree structure was violated in Iteration %d after option %d", i, choice);
+				assertTrue(debug.isTreeStructure(), stru_error);
+				final String ref_error = String.format("Some pointers are messed up in Iteration %d after option %d", i, choice);
+				assertTrue(debug.checkValidReferences(), ref_error);
+			}
+		}
+	}
+
+	private enum RandomChoice {
+		SIZE, INTERNAL_EXTERNAL, PARENT, INSERT, REMOVE, TO_ARRAY
 	}
 }
