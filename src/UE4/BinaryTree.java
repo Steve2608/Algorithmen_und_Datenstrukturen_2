@@ -11,13 +11,13 @@ public class BinaryTree implements BinarySearchTree {
 	}
 
 	@Override
-	public boolean isRoot(final Long key) throws IllegalArgumentException {
+	public boolean isRoot(final Integer key) throws IllegalArgumentException {
 		if (key == null) throw new IllegalArgumentException("Cannot compare with null key");
-		return root != null && key.equals(root.data);
+		return root != null && key.equals(root.key);
 	}
 
 	@Override
-	public boolean isInternal(final Long key) throws IllegalArgumentException {
+	public boolean isInternal(final Integer key) throws IllegalArgumentException {
 		if (key == null) throw new IllegalArgumentException("Cannot search for null key");
 
 		final BinaryTreeNode node = findNode(key);
@@ -25,7 +25,7 @@ public class BinaryTree implements BinarySearchTree {
 	}
 
 	@Override
-	public boolean isExternal(final Long key) throws IllegalArgumentException {
+	public boolean isExternal(final Integer key) throws IllegalArgumentException {
 		if (key == null) throw new IllegalArgumentException("Cannot search for null key");
 
 		final BinaryTreeNode node = findNode(key);
@@ -33,27 +33,28 @@ public class BinaryTree implements BinarySearchTree {
 	}
 
 	@Override
-	public Long getParent(final Long key) throws IllegalArgumentException {
+	public Integer getParent(final Integer key) throws IllegalArgumentException {
 		if (key == null) throw new IllegalArgumentException("Cannot compare with null key");
 
 		final BinaryTreeNode ret = findNode(key);
 		if (ret == null) return null;
 
 		final BinaryTreeNode par = ret.parent;
-		return par != null ? par.data : null;
+		return par != null ? par.key : null;
 	}
 
 	@Override
-	public boolean insert(final Long elem) throws IllegalArgumentException {
-		if (elem == null) throw new IllegalArgumentException("Cannot insert a null element");
+	public boolean insert(final Integer key, final String elem) throws IllegalArgumentException {
+		if (key == null) throw new IllegalArgumentException("Cannot insert a null key");
+		if (elem == null) throw new IllegalArgumentException("Cannot insert a null elem");
 
-		if (root == null) root = new BinaryTreeNode(elem);
+		if (root == null) root = new BinaryTreeNode(key, elem);
 		else {
-			final BinaryTreeNode parent = findInsert(elem);
+			final BinaryTreeNode parent = findInsert(key);
 			if (parent == null) return false;
 
-			final BinaryTreeNode insert = new BinaryTreeNode(elem);
-			if (elem.compareTo(parent.data) < 0) parent.left = insert;
+			final BinaryTreeNode insert = new BinaryTreeNode(key, elem);
+			if (key.compareTo(parent.key) < 0) parent.left = insert;
 			else parent.right = insert;
 			insert.parent = parent;
 		}
@@ -61,11 +62,11 @@ public class BinaryTree implements BinarySearchTree {
 		return true;
 	}
 
-	private BinaryTreeNode findInsert(final Long elem) {
+	private BinaryTreeNode findInsert(final Integer elem) {
 		BinaryTreeNode curr = root;
 		while (curr.hasChildren()) {
-			if (elem.equals(curr.data)) return null;
-			if (elem.compareTo(curr.data) < 0) {
+			if (elem.equals(curr.key)) return null;
+			if (elem.compareTo(curr.key) < 0) {
 				if (curr.left == null) return curr;
 				curr = curr.left;
 			} else {
@@ -73,29 +74,29 @@ public class BinaryTree implements BinarySearchTree {
 				curr = curr.right;
 			}
 		}
-		return elem.equals(curr.data) ? null : curr;
+		return elem.equals(curr.key) ? null : curr;
 	}
 
 	@Override
-	public Long find(final Long key) throws IllegalArgumentException {
+	public String find(final Integer key) throws IllegalArgumentException {
 		if (key == null) throw new IllegalArgumentException("Cannot look for a null key");
 
 		final BinaryTreeNode node = findNode(key);
-		return node != null ? node.data : null;
+		return node != null ? node.elem : null;
 	}
 
-	private BinaryTreeNode findNode(final Long key) {
+	private BinaryTreeNode findNode(final Integer key) {
 		if (root == null || key == null) return null;
 
 		BinaryTreeNode curr = root;
-		while (curr != null && !key.equals(curr.data)) {
-			curr = key.compareTo(curr.data) < 0 ? curr.left : curr.right;
+		while (curr != null && !key.equals(curr.key)) {
+			curr = key.compareTo(curr.key) < 0 ? curr.left : curr.right;
 		}
 		return curr;
 	}
 
 	@Override
-	public boolean remove(final Long key) throws IllegalArgumentException {
+	public boolean remove(final Integer key) throws IllegalArgumentException {
 		if (key == null) throw new IllegalArgumentException("Cannot remove a null element");
 
 		final BinaryTreeNode toRemove = findNode(key);
@@ -115,7 +116,7 @@ public class BinaryTree implements BinarySearchTree {
 			root = child;
 			root.parent = null;
 		} else {
-			if (parent.data.compareTo(toRemove.data) < 0) parent.right = child;
+			if (parent.key.compareTo(toRemove.key) < 0) parent.right = child;
 			else parent.left = child;
 
 			child.parent = parent;
@@ -210,7 +211,7 @@ public class BinaryTree implements BinarySearchTree {
 		if (node != null) {
 			addToArrayPostOrder(obj, node.left, index);
 			addToArrayPostOrder(obj, node.right, index);
-			obj[index.i++] = node.data;
+			obj[index.i++] = node.elem;
 		}
 	}
 
@@ -224,7 +225,7 @@ public class BinaryTree implements BinarySearchTree {
 	private void addToArrayInOrder(final Object[] obj, final BinaryTreeNode node, final Index index) {
 		if (node != null) {
 			addToArrayInOrder(obj, node.left, index);
-			obj[index.i++] = node.data;
+			obj[index.i++] = node.elem;
 			addToArrayInOrder(obj, node.right, index);
 		}
 	}
@@ -238,7 +239,7 @@ public class BinaryTree implements BinarySearchTree {
 
 	private void addToArrayPreOrder(final Object[] obj, final BinaryTreeNode node, final Index index) {
 		if (node != null) {
-			obj[index.i++] = node.data;
+			obj[index.i++] = node.elem;
 			addToArrayPreOrder(obj, node.left, index);
 			addToArrayPreOrder(obj, node.right, index);
 		}
@@ -249,7 +250,7 @@ public class BinaryTree implements BinarySearchTree {
 		if (node != null) {
 			if (node.right != null)
 				toString(prefix + (isTail ? "│   " : "    "), false, sb, node.right);
-			sb.append(prefix).append(isTail ? "└── " : "┌── ").append(node.data).append("\n");
+			sb.append(prefix).append(isTail ? "└── " : "┌── ").append(node).append("\n");
 			if (node.left != null)
 				toString(prefix + (isTail ? "    " : "│   "), true, sb, node.left);
 		}

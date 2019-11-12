@@ -3,11 +3,13 @@ package UE4;
 public class BinaryTreeNode {
 
 	BinaryTreeNode parent, left, right;
-	Long data;
+	final Integer key;
+	final String elem;
 
-	BinaryTreeNode(final Long elem) {
-		data = elem;
-		left = right = parent = null;
+	BinaryTreeNode(final Integer key, final String elem) {
+		this.key = key;
+		this.elem = elem;
+		parent = left = right = null;
 	}
 
 	boolean hasChildren() {
@@ -16,6 +18,6 @@ public class BinaryTreeNode {
 
 	@Override
 	public String toString() {
-		return String.format("{%d}", data);
+		return String.format("[%d]:\'%s\'", key, elem);
 	}
 }
