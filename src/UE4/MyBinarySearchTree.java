@@ -41,7 +41,7 @@ public class MyBinarySearchTree implements BinarySearchTree {
 		return par != null ? par.key : null;
 	}
 
-	BinaryTreeNode getParent(final BinaryTreeNode n) {
+	private BinaryTreeNode getParent(final BinaryTreeNode n) {
 		if (n == null || n == root) return null;
 
 		for (BinaryTreeNode curr = root; curr != null; ) {
@@ -112,9 +112,9 @@ public class MyBinarySearchTree implements BinarySearchTree {
 		final BinaryTreeNode parent = getParent(toRemove);
 		if (!hasChildren(toRemove)) removeZeroChildren(parent, toRemove);
 		else if (toRemove.left != null && toRemove.right == null)
-			remove(parent, toRemove, toRemove.left);
+			removeOneChild(parent, toRemove, toRemove.left);
 		else if (toRemove.left == null && toRemove.right != null)
-			remove(parent, toRemove, toRemove.right);
+			removeOneChild(parent, toRemove, toRemove.right);
 		else removeTwoChildren(toRemove);
 
 		size--;
@@ -125,8 +125,8 @@ public class MyBinarySearchTree implements BinarySearchTree {
 		return n != null && (n.left != null || n.right != null);
 	}
 
-	private void remove(final BinaryTreeNode parent, final BinaryTreeNode toRemove, final BinaryTreeNode child) {
-		if (parent == null) {
+	private void removeOneChild(final BinaryTreeNode parent, final BinaryTreeNode toRemove, final BinaryTreeNode child) {
+		if (toRemove == root) {
 			root = child;
 		} else {
 			if (parent.key.compareTo(toRemove.key) < 0) parent.right = child;
