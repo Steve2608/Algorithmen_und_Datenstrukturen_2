@@ -8,9 +8,13 @@ public class RadixSort {
 	private static final MyLinkedList mergeList = new MyLinkedList();
 	private static MyLinkedList[] buckets;
 
-	private static int BASE = 10;
+	private static int base = 10;
 
-	public synchronized static MyLinkedList sort(final Integer[] list) {
+	// Hide constructor
+	private RadixSort() {
+	}
+
+	public static synchronized MyLinkedList sort(final Integer[] list) {
 		if (list == null) throw new IllegalArgumentException("List must not be null!");
 		for (final Integer i : list) {
 			if (i == null) throw new IllegalArgumentException("Values must not be null!");
@@ -71,13 +75,13 @@ public class RadixSort {
 				() -> new IllegalArgumentException("No max element present"));
 	}
 
-	public synchronized static int getBase() {
-		return BASE;
+	public static synchronized int getBase() {
+		return base;
 	}
 
-	public synchronized static int setBase(final int base) {
-		if (base > 1) BASE = base;
-		return BASE;
+	public static synchronized int setBase(final int base) {
+		if (base >= 2) RadixSort.base = base;
+		return RadixSort.base;
 	}
 
 }

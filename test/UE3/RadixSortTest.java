@@ -37,13 +37,13 @@ class RadixSortTest {
     }
 
     @Test
-    void testExceptions() {
+    void testTestExceptions() {
         assertThrows(IllegalArgumentException.class, () -> RadixSort.sort(null));
         assertThrows(IllegalArgumentException.class, () -> RadixSort.sort(new Integer[]{5, null}));
     }
 
     @Test
-    void link() {
+    void testLink() {
         final MyLinkedList l1 = new MyLinkedList(), l2 = new MyLinkedList();
         l1.add(3);
         l1.add(7);
@@ -65,7 +65,7 @@ class RadixSortTest {
     }
 
     @Test
-    void sort() {
+    void testSort() {
         assertArrayEquals(b, listToArray(RadixSort.sort(a)));
         assertArrayEquals(d, listToArray(RadixSort.sort(c)));
     }

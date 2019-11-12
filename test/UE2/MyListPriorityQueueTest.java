@@ -1,6 +1,5 @@
 package UE2;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,22 +9,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MyListPriorityQueueTest {
 
-	private MyPriorityQueue<Long> queue = new MyListPriorityQueue<>();
+	private MyPriorityQueue<Long> queue;
 
 	@BeforeEach
 	void setUp() {
+		queue = new MyListPriorityQueue<>();
 		queue.insert(11L);
 		queue.insert(7L);
 		queue.insert(9L);
 	}
 
-	@AfterEach
-	void tearDown() {
-		queue = new MyListPriorityQueue<>();
-	}
-
 	@Test
-	void isEmpty() {
+	void testIsEmpty() {
 		assertFalse(queue.isEmpty());
 
 		queue.removeMin();
@@ -38,7 +33,7 @@ class MyListPriorityQueueTest {
 	}
 
 	@Test
-	void size() {
+	void testSize() {
 		assertEquals(3, queue.size());
 		queue.removeMin();
 		assertEquals(2, queue.size());
@@ -49,7 +44,7 @@ class MyListPriorityQueueTest {
 	}
 
 	@Test
-	void insert() {
+	void testInsert() {
 		queue.insert(15L);
 		assertArrayEquals(new Long[]{7L, 9L, 11L, 15L}, queue.toArray());
 
@@ -62,7 +57,7 @@ class MyListPriorityQueueTest {
 	}
 
 	@Test
-	void removeMin() {
+	void testRemoveMin() {
 		assertEquals(7L, queue.removeMin());
 		assertEquals(9L, queue.removeMin());
 		assertEquals(11L, queue.removeMin());
@@ -71,7 +66,7 @@ class MyListPriorityQueueTest {
 	}
 
 	@Test
-	void min() {
+	void testMin() {
 		assertEquals(7L, queue.min());
 
 		queue.removeMin();
@@ -82,7 +77,7 @@ class MyListPriorityQueueTest {
 	}
 
 	@Test
-	void toArray() {
+	void testToArray() {
 		assertArrayEquals(new Long[]{7L, 9L, 11L}, queue.toArray());
 
 		queue.removeMin();
