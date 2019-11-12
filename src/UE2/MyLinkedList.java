@@ -105,7 +105,7 @@ public class MyLinkedList<T extends Comparable<T>> implements MyList<T>, Iterabl
 
 			final MyListNode<T> temp = new MyListNode<>(val, next);
 			prev.setNext(temp);
-			isDescending &= val.compareTo(next.getElement()) >= 0;
+			isDescending &= next == null || val.compareTo(next.getElement()) >= 0;
 		}
 		size++;
 	}
