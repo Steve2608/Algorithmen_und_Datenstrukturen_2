@@ -23,7 +23,7 @@ class DebugTree extends MyBinarySearchTree {
 		return checkValidReferences(root);
 	}
 
-	BinaryTreeNode getParent(final BinaryTreeNode n) {
+	private BinaryTreeNode getParent(final BinaryTreeNode n) {
 		if (n == null || n == root) return null;
 
 		for (BinaryTreeNode curr = root; curr != null; ) {
@@ -290,6 +290,19 @@ class MyBinarySearchTreeTest {
 				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArrayPreOrder());
 		assertArrayEquals(new String[0], new MyBinarySearchTree().toArrayPreOrder(), "Empty tree must produce empty array");
+	}
+
+	@Test
+	void testAllMethodsOnEmptyTree() {
+		final BinarySearchTree empty = new MyBinarySearchTree();
+
+		assertEquals(0, empty.size(), "Empty tree has 0 elements");
+		assertFalse(empty.remove(2), "No element can be removed");
+		assertFalse(empty.isExternal(2), "No element can be external");
+		assertFalse(empty.isInternal(2), "No element can be internal");
+		assertFalse(empty.isRoot(2), "No element can be root");
+		assertNull(empty.find(2), "No element can be found");
+		assertNull(empty.getParent(2), "No element can be found");
 	}
 
 	@Test
