@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RadixSortTest {
 
-    private static Integer[] a = {4, 6, 9, 132, 12313, 453};
-    private static Integer[] b, c, d;
+	private static final Integer[] a = {4, 6, 9, 132, 12313, 453};
+	private static final Integer[] b, c, d;
 
     static {
         b = Arrays.copyOf(a, a.length);
