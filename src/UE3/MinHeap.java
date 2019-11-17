@@ -69,7 +69,7 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 	}
 
 	private boolean validIndex(final int index) {
-		return MIN_INDEX <= index && index <= size();
+		return MIN_INDEX <= index && index < size();
 	}
 
 	@Override
