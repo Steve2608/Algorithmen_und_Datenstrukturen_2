@@ -27,7 +27,7 @@ public class RadixSort {
 		for (int i = 0; i < noSorts; i++) {
 			for (MyNode node = mergeList.head; node != null; node = node.next) {
 				final Integer val = node.value;
-				buckets[getBucketIndex(val, i)].add(val);
+				buckets[getDigit(val, i)].add(val);
 			}
 			nextIter();
 		}
@@ -42,7 +42,7 @@ public class RadixSort {
 		return n;
 	}
 
-	private static int getBucketIndex(final int val, final int exponent) {
+	private static int getDigit(final int val, final int exponent) {
 		return (int) (val / Math.pow(getBase(), exponent) % getBase());
 	}
 
