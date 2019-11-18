@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Helper class for easier debugging of tree
- * TODO set <tt>root</tt> in <tt>BinaryTree</tt> to be >= package
  */
 class DebugTree extends MyBinarySearchTree {
 
@@ -20,13 +19,13 @@ class DebugTree extends MyBinarySearchTree {
 	 * @return match
 	 */
 	boolean checkValidReferences() {
-		return checkValidReferences(root);
+		return checkValidReferences(getRoot());
 	}
 
 	BinaryTreeNode getParent(final BinaryTreeNode n) {
-		if (n == null || n == root) return null;
+		if (n == null || n == getRoot()) return null;
 
-		for (BinaryTreeNode curr = root; curr != null; ) {
+		for (BinaryTreeNode curr = getRoot(); curr != null; ) {
 			if (curr.left == n || curr.right == n) return curr;
 			curr = n.key.compareTo(curr.key) < 0 ? curr.left : curr.right;
 		}
@@ -51,7 +50,7 @@ class DebugTree extends MyBinarySearchTree {
 	 * @return tree-structure
 	 */
 	boolean isTreeStructure() {
-		return isTreeStructure(root);
+		return isTreeStructure(getRoot());
 	}
 
 	private boolean isTreeStructure(final BinaryTreeNode n) {
@@ -87,7 +86,7 @@ class DebugTree extends MyBinarySearchTree {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		toString("", true, sb, root);
+		toString("", true, sb, getRoot());
 		return sb.toString();
 	}
 

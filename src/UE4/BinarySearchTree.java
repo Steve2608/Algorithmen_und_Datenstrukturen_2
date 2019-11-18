@@ -2,6 +2,8 @@ package UE4;
 
 public interface BinarySearchTree {
 
+	BinaryTreeNode getRoot();
+
 	boolean insert(Integer key, String elem) throws IllegalArgumentException;
 
 	String find(Integer key) throws IllegalArgumentException;

@@ -2,8 +2,13 @@ package UE4;
 
 public class MyBinarySearchTree implements BinarySearchTree {
 
-	protected BinaryTreeNode root;
+	private BinaryTreeNode root;
 	private int size = 0;
+
+	@Override
+	public BinaryTreeNode getRoot() {
+		return root;
+	}
 
 	@Override
 	public int size() {
@@ -42,13 +47,7 @@ public class MyBinarySearchTree implements BinarySearchTree {
 	}
 
 	BinaryTreeNode getParent(final BinaryTreeNode n) {
-		if (n == null || n == root) return null;
-
-		for (BinaryTreeNode curr = root; curr != null; ) {
-			if (curr.left == n || curr.right == n) return curr;
-			curr = n.key.compareTo(curr.key) < 0 ? curr.left : curr.right;
-		}
-		return null;
+		return n != null ? n.parent : null;
 	}
 
 	@Override
@@ -64,6 +63,7 @@ public class MyBinarySearchTree implements BinarySearchTree {
 			final BinaryTreeNode insert = new BinaryTreeNode(key, elem);
 			if (key.compareTo(parent.key) < 0) parent.left = insert;
 			else parent.right = insert;
+			insert.parent = parent;
 		}
 		size++;
 		return true;
@@ -112,9 +112,9 @@ public class MyBinarySearchTree implements BinarySearchTree {
 		final BinaryTreeNode parent = getParent(toRemove);
 		if (!hasChildren(toRemove)) removeZeroChildren(parent, toRemove);
 		else if (toRemove.left != null && toRemove.right == null)
-			remove(parent, toRemove, toRemove.left);
+			removeOneChild(parent, toRemove, toRemove.left);
 		else if (toRemove.left == null && toRemove.right != null)
-			remove(parent, toRemove, toRemove.right);
+			removeOneChild(parent, toRemove, toRemove.right);
 		else removeTwoChildren(toRemove);
 
 		size--;
@@ -125,13 +125,14 @@ public class MyBinarySearchTree implements BinarySearchTree {
 		return n != null && (n.left != null || n.right != null);
 	}
 
-	private void remove(final BinaryTreeNode parent, final BinaryTreeNode toRemove, final BinaryTreeNode child) {
+	private void removeOneChild(final BinaryTreeNode parent, final BinaryTreeNode toRemove, final BinaryTreeNode child) {
 		if (parent == null) {
 			root = child;
 		} else {
 			if (parent.key.compareTo(toRemove.key) < 0) parent.right = child;
 			else parent.left = child;
 		}
+		child.parent = parent;
 	}
 
 	private void removeTwoChildren(final BinaryTreeNode toRemove) {
@@ -146,13 +147,20 @@ public class MyBinarySearchTree implements BinarySearchTree {
 	                                       final BinaryTreeNode nSuccessor, final BinaryTreeNode pSuccessor) {
 		if (parent.left == toRemove) parent.left = nSuccessor;
 		else parent.right = nSuccessor;
+		nSuccessor.parent = parent;
 
 		if (pSuccessor == toRemove) {
 			nSuccessor.left = toRemove.left;
+			toRemove.left.parent = nSuccessor;
 		} else {
 			pSuccessor.left = nSuccessor.right;
+			if (pSuccessor.right != null)
+				pSuccessor.right.parent = pSuccessor;
+
 			nSuccessor.right = toRemove.right;
+			toRemove.right.parent = nSuccessor;
 			nSuccessor.left = toRemove.left;
+			toRemove.left.parent = nSuccessor;
 		}
 	}
 
@@ -160,11 +168,16 @@ public class MyBinarySearchTree implements BinarySearchTree {
 		if (nSuccessor == root.right) {
 			nSuccessor.left = root.left;
 		} else {
-			if (pSuccessor != root) pSuccessor.left = nSuccessor.right;
+			if (pSuccessor != root) {
+				pSuccessor.left = nSuccessor.right;
+				if (nSuccessor.right != null)
+					nSuccessor.right.parent = pSuccessor;
+			}
 			nSuccessor.left = root.left;
 			nSuccessor.right = root.right;
 		}
 		root = nSuccessor;
+		root.parent = null;
 	}
 
 	private BinaryTreeNode inOrderSuccessor(final BinaryTreeNode node) {
