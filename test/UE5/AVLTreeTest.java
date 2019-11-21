@@ -18,11 +18,11 @@ class DebugTree extends AVLTree {
 	 *
 	 * @return match
 	 */
-	boolean checkValidReferences() {
-		return checkValidReferences(getRoot());
+	boolean checkSymmetricReferences() {
+		return checkSymmetricReferences(getRoot());
 	}
 
-	private boolean checkValidReferences(final AVLTreeNode n) {
+	private boolean checkSymmetricReferences(final AVLTreeNode n) {
 		if (n != null) {
 			final AVLTreeNode parent = getParent(n), left = n.left, right = n.right;
 			if (parent != null && (parent.left == n && parent.right == n || parent.left != n && parent.right != n)) {
@@ -37,7 +37,7 @@ class DebugTree extends AVLTree {
 				System.out.println("Right: " + toString(right));
 				return false;
 			}
-			return checkValidReferences(left) && checkValidReferences(right);
+			return checkSymmetricReferences(left) && checkSymmetricReferences(right);
 		}
 		return true;
 	}
@@ -57,11 +57,11 @@ class DebugTree extends AVLTree {
 	 *
 	 * @return tree-structure
 	 */
-	boolean isTreeStructure() {
-		return isTreeStructure(getRoot());
+	boolean isAVLTreeStructure() {
+		return isAVLTreeStructure(getRoot());
 	}
 
-	private boolean isTreeStructure(final AVLTreeNode n) {
+	private boolean isAVLTreeStructure(final AVLTreeNode n) {
 		if (n != null) {
 			final AVLTreeNode left = n.left, right = n.right;
 			if (left != null && n.key.compareTo(left.key) < 0) return false;
@@ -70,7 +70,7 @@ class DebugTree extends AVLTree {
 				System.out.println(toString(n));
 				return false;
 			}
-			return isTreeStructure(left) && isTreeStructure(right);
+			return isAVLTreeStructure(left) && isAVLTreeStructure(right);
 		}
 		return true;
 	}
@@ -108,7 +108,7 @@ class DebugTree extends AVLTree {
 
 }
 
-class MyBinarySearchTreeTest {
+class AVLTreeTest {
 
 	/**
 	 * Number of random trial runs
@@ -232,6 +232,49 @@ class MyBinarySearchTreeTest {
 	}
 
 	@Test
+	void testHeight() {
+		assertEquals(3, tree.height(), "Height was assessed incorrectly");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(1);
+		assertEquals(3, tree.height(), "Height was assessed incorrectly");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(7);
+		assertEquals(3, tree.height(), "Height was assessed incorrectly");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(12);
+		assertEquals(2, tree.height(), "Height was assessed incorrectly");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(18);
+		assertEquals(2, tree.height(), "Height was assessed incorrectly");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(11);
+		assertEquals(2, tree.height(), "Height was assessed incorrectly");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(5);
+		assertEquals(1, tree.height(), "Height was assessed incorrectly");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(3);
+		assertEquals(1, tree.height(), "Height was assessed incorrectly");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(0);
+		assertEquals(0, tree.height(), "Tree with one node must have height == 0");
+
+		if (PRINT) System.out.println(tree);
+		tree.remove(29);
+		assertEquals(-1, tree.height(), "Empty tree must have height == -1");
+
+		assertEquals(-1, new AVLTree().height(), "New must have size == -1");
+	}
+
+	@Test
 	void testToArray() {
 		final Object[] strings = IntStream.of(0, 1, 3, 5, 7, 11, 12, 18, 29)
 				.mapToObj(i -> String.valueOf(-i)).toArray();
@@ -262,6 +305,9 @@ class MyBinarySearchTreeTest {
 							"If tree contains element, it cannot be inserted and vice versa");
 					if (insert) size++;
 					break;
+				case HEIGHT:
+					// super basic
+					assertDoesNotThrow(tree::height);
 				case REMOVE:
 					final boolean remove;
 					assertEquals(tree.find(k) != null, remove = tree.remove(k),
@@ -278,16 +324,15 @@ class MyBinarySearchTreeTest {
 			}
 			if (USE_DEBUG_TREE) {
 				final DebugTree debug = (DebugTree) tree;
-				System.out.println(tree);
-				assertTrue(debug.isTreeStructure(), "Malformed tree structure");
-				assertTrue(debug.checkValidReferences(), "Messed up pointers");
+				assertTrue(debug.isAVLTreeStructure(), "Malformed tree structure");
+				// Dies at i=528 for me because apparently I suck
+				assertTrue(debug.checkSymmetricReferences(), "Messed up pointers");
 			}
 		}
 	}
 
 	enum RandomChoice {
-		SIZE, INSERT, REMOVE, TO_ARRAY
+		SIZE, INSERT, HEIGHT, REMOVE, TO_ARRAY
 	}
-
 
 }
