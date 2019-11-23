@@ -42,7 +42,7 @@ class DebugTree extends AVLTree {
 		return true;
 	}
 
-	AVLTreeNode getParent(final AVLTreeNode n) {
+	private AVLTreeNode getParent(final AVLTreeNode n) {
 		if (n == null || n == getRoot()) return null;
 
 		for (AVLTreeNode curr = getRoot(); curr != null; ) {
@@ -113,7 +113,7 @@ class AVLTreeTest {
 	/**
 	 * Number of random trial runs
 	 */
-	private static final int N_TRIALS = 100_000;
+	private static final int N_TRIALS = 500_000;
 	/**
 	 * Highest value a key can take (exclusive)
 	 */
@@ -161,20 +161,6 @@ class AVLTreeTest {
 		tree.remove(11);
 		if (PRINT) System.out.println(tree);
 		assertEquals(9, tree.size(), "Size must not change upon removal of not-contained element");
-	}
-
-	@Test
-	void testIsRoot() {
-		assertThrows(IllegalArgumentException.class, () -> tree.isRoot(null),
-				"IllegalArgumentException must be thrown on empty element");
-		assertTrue(tree.isRoot(5), "Root was not detected as such");
-
-		tree.remove(5);
-		if (PRINT) System.out.println(tree);
-		assertTrue(tree.isRoot(7), "Root was not updated correctly");
-
-		assertFalse(tree.isRoot(5), "Not-present element cannot be root");
-		assertFalse(tree.isRoot(11), "Non-root element was root");
 	}
 
 	@Test
@@ -308,6 +294,7 @@ class AVLTreeTest {
 				case HEIGHT:
 					// super basic
 					assertDoesNotThrow(tree::height);
+					break;
 				case REMOVE:
 					final boolean remove;
 					assertEquals(tree.find(k) != null, remove = tree.remove(k),

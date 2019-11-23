@@ -16,17 +16,8 @@ public class AVLTree {
 		return size;
 	}
 
-	public boolean isRoot(final Integer key) throws IllegalArgumentException {
-		if (key == null) throw new IllegalArgumentException("Cannot compare with null key");
-		return root != null && key.equals(root.key);
-	}
-
 	public int height() {
 		return root != null ? root.height : -1;
-	}
-
-	AVLTreeNode getParent(final AVLTreeNode n) {
-		return n != null ? n.parent : null;
 	}
 
 	public boolean insert(final Integer key, final String elem) throws IllegalArgumentException {
@@ -65,61 +56,8 @@ public class AVLTree {
 	}
 
 	private void restructure(final AVLTreeNode grandChild) {
-		if (grandChild == null) return;
-		if (size() == 1) {
-			updateHeightsUpward(grandChild);
-			return;
-		}
-		final AVLTreeNode child = grandChild.parent, parent = child.parent;
-		final AVLTreeNode[] sort = {parent, child, grandChild};
-		Arrays.sort(sort, Comparator.comparingInt(node -> node.key));
-
-		final NodeGroup nodes = new NodeGroup();
-		nodes.first = sort[0].left;
-		nodes.newLeft = sort[0];
-		nodes.newParent = sort[1];
-		nodes.newRight = sort[2];
-		nodes.fourth = sort[2].right;
-
-		if (nodes.newParent != child) {
-			nodes.second = grandChild.left;
-			nodes.third = grandChild.right;
-		} else {
-			if (grandChild.key < parent.key) {
-				nodes.second = nodes.newLeft.right;
-				nodes.third = nodes.newParent.right;
-			} else {
-				nodes.second = nodes.newParent.left;
-				nodes.third = nodes.newRight.left;
-			}
-		}
-
-		// Cut & Link
-		final AVLTreeNode grandparent = parent.parent;
-		if (root == parent || grandparent == null) root = nodes.newParent;
-		nodes.newParent.left = nodes.newLeft;
-		nodes.newLeft.parent = nodes.newParent;
-		nodes.newParent.right = nodes.newRight;
-		nodes.newRight.parent = nodes.newParent;
-
-		nodes.newLeft.left = nodes.first;
-		if (nodes.first != null) nodes.first.parent = nodes.newLeft;
-		nodes.newLeft.right = nodes.second;
-		if (nodes.second != null) nodes.second.parent = nodes.newLeft;
-
-		nodes.newRight.left = nodes.third;
-		if (nodes.third != null) nodes.third.parent = nodes.newRight;
-		// nodes.newRight.right = nodes.fourth;
-		if (nodes.fourth != null) nodes.fourth.parent = nodes.newRight;
-
-		nodes.newParent.parent = grandparent;
-		if (grandparent != null) {
-			if (grandparent.left == parent) {
-				grandparent.left = nodes.newParent;
-			} else if (grandparent.right == parent) {
-				grandparent.right = nodes.newParent;
-			}
-		}
+		if (grandChild == null || size() <= 2) return;
+		new NodeGroup(grandChild).cutAndLink();
 	}
 
 	private int height(final AVLTreeNode node) {
@@ -130,21 +68,14 @@ public class AVLTree {
 		node.height = Math.max(height(node.left), height(node.right)) + 1;
 	}
 
-	private void updateHeightsUpward(AVLTreeNode curr) {
-		while (curr != null) {
-			setNewHeight(curr);
-			curr = curr.parent;
-		}
-	}
-
 	private AVLTreeNode findErrorNode(final AVLTreeNode n) {
 		if (!hasChildren(n)) return null;
 
 		final int right = height(n.right);
 		final int left = height(n.left);
 		if (Math.abs(right - left) >= 2) {
-			final AVLTreeNode parent = right > left ? n.right : n.left;
-			return height(parent.right) > height(parent.left) ? parent.right : parent.left;
+			final AVLTreeNode child = right > left ? n.right : n.left;
+			return height(child.right) > height(child.left) ? child.right : child.left;
 		}
 		final AVLTreeNode error = findErrorNode(n.left);
 		return error != null ? error : findErrorNode(n.right);
@@ -173,7 +104,7 @@ public class AVLTree {
 		final AVLTreeNode toRemove = findNode(key);
 		if (toRemove == null) return false;
 
-		final AVLTreeNode parent = getParent(toRemove);
+		final AVLTreeNode parent = toRemove.parent;
 		if (!hasChildren(toRemove)) removeZeroChildren(parent, toRemove);
 		else if (toRemove.left != null && toRemove.right == null)
 			removeOneChild(parent, toRemove, toRemove.left);
@@ -212,9 +143,8 @@ public class AVLTree {
 
 	private void removeOneChild(final AVLTreeNode parent, final AVLTreeNode toRemove, final AVLTreeNode child) {
 		child.parent = parent;
-		if (parent == null) {
+		if (toRemove == root) {
 			root = child;
-			root.height--;
 		} else {
 			if (parent.left == toRemove) parent.left = child;
 			else parent.right = child;
@@ -222,8 +152,9 @@ public class AVLTree {
 	}
 
 	private void removeTwoChildren(final AVLTreeNode toRemove) {
-		final AVLTreeNode parent = getParent(toRemove), nSuccessor = inOrderSuccessor(toRemove);
-		final AVLTreeNode pSuccessor = getParent(nSuccessor);
+		final AVLTreeNode parent = toRemove.parent, nSuccessor = inOrderSuccessor(toRemove);
+		assert nSuccessor != null;
+		final AVLTreeNode pSuccessor = nSuccessor.parent;
 
 		if (toRemove == root) removeRootTwoChildren(nSuccessor, pSuccessor);
 		else removeInternalTwoChildren(toRemove, parent, nSuccessor, pSuccessor);
@@ -240,7 +171,7 @@ public class AVLTree {
 			toRemove.left.parent = nSuccessor;
 		} else {
 			pSuccessor.left = nSuccessor.right;
-			if (pSuccessor.right != null) pSuccessor.right.parent = pSuccessor;
+			if (nSuccessor.right != null) nSuccessor.right.parent = pSuccessor;
 
 			nSuccessor.right = toRemove.right;
 			toRemove.right.parent = nSuccessor;
@@ -254,14 +185,13 @@ public class AVLTree {
 			nSuccessor.left = root.left;
 			root.left.parent = nSuccessor;
 		} else {
-			if (pSuccessor != root) {
-				pSuccessor.left = nSuccessor.right;
-				if (nSuccessor.right != null) {
-					nSuccessor.right.parent = pSuccessor;
-				}
-			}
+			pSuccessor.left = nSuccessor.right;
+			if (nSuccessor.right != null) nSuccessor.right.parent = pSuccessor;
 			nSuccessor.left = root.left;
+			root.left.parent = nSuccessor;
+
 			nSuccessor.right = root.right;
+			root.right.parent = nSuccessor;
 		}
 		root = nSuccessor;
 		root.parent = null;
@@ -274,16 +204,16 @@ public class AVLTree {
 			return successor;
 		}
 
-		AVLTreeNode p = getParent(node), successor = node;
+		AVLTreeNode p = node.parent, successor = node;
 		while (p != null && p.right == successor) {
 			successor = p;
-			p = getParent(successor);
+			p = successor.parent;
 		}
 		return p;
 	}
 
 	private void removeZeroChildren(final AVLTreeNode parent, final AVLTreeNode toRemove) {
-		if (parent == null) root = null;
+		if (toRemove == root) root = null;
 		else {
 			if (parent.left == toRemove) parent.left = null;
 			else parent.right = null;
@@ -326,9 +256,67 @@ public class AVLTree {
 		private int i = 0;
 	}
 
-	private static class NodeGroup {
-		private AVLTreeNode newLeft, newRight, newParent;
-		private AVLTreeNode first, second, third, fourth;
+	private class NodeGroup {
+		private final AVLTreeNode newLeft, newRight, newParent;
+		private final AVLTreeNode first, second, third, fourth;
+		private final AVLTreeNode parent;
+
+		NodeGroup(final AVLTreeNode grandChild) {
+			final AVLTreeNode child = grandChild.parent;
+			parent = child.parent;
+
+			assert parent != null : "Parent cannot be null here!";
+			final AVLTreeNode[] sort = {parent, child, grandChild};
+			Arrays.sort(sort, Comparator.comparingInt(node -> node.key));
+
+			first = sort[0].left;
+			newLeft = sort[0];
+			newParent = sort[1];
+			newRight = sort[2];
+			fourth = sort[2].right;
+
+			if (newParent != child) {
+				second = grandChild.left;
+				third = grandChild.right;
+			} else {
+				if (grandChild.key < parent.key) {
+					second = newLeft.right;
+					third = newParent.right;
+				} else {
+					second = newParent.left;
+					third = newRight.left;
+				}
+			}
+		}
+
+		void cutAndLink() {
+			final AVLTreeNode grandparent = parent.parent;
+			newParent.left = newLeft;
+			newLeft.parent = newParent;
+			newParent.right = newRight;
+			newRight.parent = newParent;
+
+			// newLeft.left = first;
+			if (first != null) first.parent = newLeft;
+			newLeft.right = second;
+			if (second != null) second.parent = newLeft;
+
+			newRight.left = third;
+			if (third != null) third.parent = newRight;
+			// newRight.right = fourth;
+			if (fourth != null) fourth.parent = newRight;
+
+			newParent.parent = grandparent;
+			if (grandparent != null) {
+				if (grandparent.left == parent) grandparent.left = newParent;
+				else grandparent.right = newParent;
+
+			}
+			if (root == parent) {
+				root = newParent;
+				root.parent = null;
+			}
+		}
 	}
 
 }
