@@ -228,8 +228,8 @@ public class AVLTree {
 
 	private void toArray(final Object[] obj, final AVLTreeNode node, final Index index) {
 		if (node != null) {
-			toArray(obj, node.left, index);
 			obj[index.i++] = node.elem;
+			toArray(obj, node.left, index);
 			toArray(obj, node.right, index);
 		}
 	}

@@ -212,7 +212,7 @@ class AVLTreeTest {
 		if (PRINT) System.out.println(tree);
 		assertFalse(tree.remove(5), "Cannot remove non-contained Node");
 		if (PRINT) System.out.println(tree);
-		final Object[] strings = IntStream.of(0, 3, 11, 18, 29)
+		final Object[] strings = IntStream.of(11, 3, 0, 18, 29)
 				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArray(), "Structure of tree was violated");
 	}
@@ -262,7 +262,7 @@ class AVLTreeTest {
 
 	@Test
 	void testToArray() {
-		final Object[] strings = IntStream.of(0, 1, 3, 5, 7, 11, 12, 18, 29)
+		final Object[] strings = IntStream.of(5, 1, 0, 3, 12, 7, 11, 29, 18)
 				.mapToObj(i -> String.valueOf(-i)).toArray();
 		assertArrayEquals(strings, tree.toArray());
 		assertArrayEquals(new String[0], new AVLTree().toArray(), "Empty tree must produce empty array");
