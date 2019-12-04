@@ -13,7 +13,6 @@ class RadixSortTest {
 
 	private static final Integer[] a = {4, 6, 9, 132, 12313, 453};
 	private static final Integer[] b, c, d;
-	private static final Integer[] e = {994129, 978850}, f = {978850, 994129};
 
 	static {
 		b = Arrays.copyOf(a, a.length);
@@ -63,16 +62,21 @@ class RadixSortTest {
 		assertEquals(5, l3.head.value);
 		assertEquals(2, l2.tail.value);
 		assertEquals(2, l3.tail.value);
+
+		l3.link(null);
+		assertEquals(5, l3.head.value);
+		assertNotNull(l3.tail);
+		assertEquals(2, l3.tail.value);
+
+		l3.link(new MyLinkedList());
+		assertEquals(5, l3.head.value);
+		assertNotNull(l3.tail);
+		assertEquals(2, l3.tail.value);
 	}
 
 	@Test
 	void testSort() {
 		assertArrayEquals(b, listToArray(RadixSort.sort(a)));
 		assertArrayEquals(d, listToArray(RadixSort.sort(c)));
-	}
-
-	@Test
-	void testBigNumbers() {
-		assertArrayEquals(f, listToArray(RadixSort.sort(e)));
 	}
 }

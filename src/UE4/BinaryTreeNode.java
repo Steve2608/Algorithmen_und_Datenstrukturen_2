@@ -2,14 +2,14 @@ package UE4;
 
 public class BinaryTreeNode {
 
-	BinaryTreeNode left, right;
 	final Integer key;
 	final String elem;
+	BinaryTreeNode left, right, parent;
 
 	BinaryTreeNode(final Integer key, final String elem) {
 		this.key = key;
 		this.elem = elem;
-		left = right = null;
+		left = right = parent = null;
 	}
 
 	@Override

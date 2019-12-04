@@ -63,13 +63,12 @@ public class MinHeap<T extends Comparable<T>> implements MyPriorityQueue<T> {
 
 	private void doubleSize() {
 		final Object[] copy = content;
-		// remember to keep one blank field
 		content = new Object[content.length * 2];
 		System.arraycopy(copy, MIN_INDEX, content, MIN_INDEX, copy.length);
 	}
 
 	private boolean validIndex(final int index) {
-		return MIN_INDEX <= index && index <= size();
+		return MIN_INDEX <= index && index < size();
 	}
 
 	@Override

@@ -13,20 +13,17 @@ public class MyLinkedList {
 		} else {
 			final MyNode tmp = new MyNode(val);
 			tail.next = tmp;
-			tail = tail.next;
+			tail = tmp;
 		}
 	}
 
 	public void link(final MyLinkedList list) {
 		if (list == null || list.head == null) return;
 
-		if (head == null) {
-			head = list.head;
-			tail = list.tail;
-		} else {
-			tail.next = list.head;
-			tail = list.tail;
-		}
+		if (head == null) head = list.head;
+		else tail.next = list.head;
+
+		tail = list.tail;
 	}
 
 }
