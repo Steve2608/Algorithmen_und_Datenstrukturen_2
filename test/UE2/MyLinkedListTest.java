@@ -178,7 +178,7 @@ class MyLinkedListTest {
 
 	@Test
 	void testManyElems() {
-		assertTimeout(Duration.ofMillis(500), () -> {
+		assertTimeout(Duration.ofMillis(5000), () -> {
 			for (int i = 0; i < 10_000; i++) {
 				list.addSorted((long) (Math.random() * 1_000_000_000));
 			}
