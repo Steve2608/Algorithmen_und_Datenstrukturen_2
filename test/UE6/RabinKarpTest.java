@@ -42,7 +42,7 @@ public class RabinKarpTest {
 	@Test
 	public void searchNoMatches() {
 		final Result expected = initResult(0);
-		final Result actual = BoyerMoore.search("bla", "blub");
+		final Result actual = RabinKarp.search("bla", "blub");
 		assertEquals(expected.count, actual.count, "Number of matches differed");
 		assertArrayEquals(expected.resultIndices, actual.resultIndices, "Match indices differed");
 	}
