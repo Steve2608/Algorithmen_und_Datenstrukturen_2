@@ -1,7 +1,5 @@
 package UE6;
 
-import java.util.Arrays;
-
 public class Result {
 
 	int[] resultIndices;
@@ -15,7 +13,7 @@ public class Result {
 
 class BetterResult extends Result {
 
-	public BetterResult(final int[] resultIndices, final int count) {
+	BetterResult(final int[] resultIndices, final int count) {
 		super(resultIndices, count);
 	}
 
@@ -23,19 +21,27 @@ class BetterResult extends Result {
 		this(new int[0], 0);
 	}
 
-	public static BetterResult none() {
+	static BetterResult none() {
 		return new BetterResult();
 	}
 
-	public void found(final int index) {
-		final int len = resultIndices.length;
-		resultIndices = Arrays.copyOf(resultIndices, len + 1);
-		resultIndices[len] = index;
+	void found(final int index) {
+		final int[] newResults = new int[resultIndices.length + 1];
+		System.arraycopy(resultIndices, 0, newResults, 0, resultIndices.length);
+		newResults[resultIndices.length] = index;
+
+		resultIndices = newResults;
 		count++;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Result{resultIndices=%s, count=%d}", Arrays.toString(resultIndices), count);
+		final StringBuilder sb = new StringBuilder("[");
+		for (final int resultIndex : resultIndices) {
+			sb.append(resultIndex).append(", ");
+		}
+		sb.replace(sb.length() - 2, sb.length(), "]");
+
+		return String.format("Result{resultIndices=%s, count=%d}", sb, count);
 	}
 }
