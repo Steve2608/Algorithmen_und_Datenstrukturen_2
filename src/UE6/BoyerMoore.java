@@ -14,20 +14,20 @@ public class BoyerMoore {
 
 	public static Result search(final String needle, final String haystack) throws IllegalArgumentException {
 		if (haystack == null) throw new IllegalArgumentException("Cannot search in null text");
-		if (needle == null || needle.length() <= 0)
-			throw new IllegalArgumentException("Cannot search in [null | empty] pattern");
+		if (needle == null || needle.isEmpty())
+			throw new IllegalArgumentException("Cannot search for [null | empty] pattern");
 
 		final BetterResult result = BetterResult.none();
 		if (needle.length() > haystack.length()) return result;
 
-		final char[] c_text = haystack.toCharArray(), c_pattern = needle.toCharArray();
-		final int m = c_pattern.length, n = c_text.length;
+		final char[] text = haystack.toCharArray(), pattern = needle.toCharArray();
+		final int m = pattern.length, n = text.length;
 
-		init(c_pattern);
+		init(pattern);
 		int i = m - 1, j = m - 1;
 
 		do {
-			if (c_pattern[j] == c_text[i]) {
+			if (pattern[j] == text[i]) {
 				if (j == 0) {
 					result.found(i);
 					i += m;
@@ -38,7 +38,7 @@ public class BoyerMoore {
 				}
 			} else {
 				i += m - j - 1;
-				i += max(j - last(c_text[i]), match(j));
+				i += max(j - last(text[i]), match(j));
 				j = m - 1;
 			}
 		} while (i <= n - 1);

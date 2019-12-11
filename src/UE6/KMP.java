@@ -9,20 +9,20 @@ public class KMP {
 
 	public static Result search(final String needle, final String haystack) throws IllegalArgumentException {
 		if (haystack == null) throw new IllegalArgumentException("Cannot search in null text");
-		if (needle == null || needle.length() <= 0)
-			throw new IllegalArgumentException("Cannot search in [null | empty] pattern");
+		if (needle == null || needle.isEmpty())
+			throw new IllegalArgumentException("Cannot search for [null | empty] pattern");
 
 		final BetterResult result = BetterResult.none();
 		if (needle.length() > haystack.length()) return result;
 
-		final char[] c_text = haystack.toCharArray(), c_pattern = needle.toCharArray();
-		final int m = c_pattern.length, n = c_text.length;
+		final char[] text = haystack.toCharArray(), pattern = needle.toCharArray();
+		final int m = pattern.length, n = text.length;
 
-		initFailure(c_pattern);
+		initFailure(pattern);
 		int i = 0, j = 0;
 
 		while (i < n) {
-			if (c_pattern[j] == c_text[i]) {
+			if (pattern[j] == text[i]) {
 				if (j == needle.length() - 1) {
 					result.found(i - (m - 1));
 					i = i - (m - 2);
