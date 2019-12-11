@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 public class Result {
 
-	public Integer[] resultIndices;
-	public int count;
+	int[] resultIndices;
+	int count;
 
-	public Result(final Integer[] resultIndices, final int count) {
+	public Result(final int[] resultIndices, final int count) {
 		this.resultIndices = resultIndices.clone();
 		this.count = count;
 	}
@@ -15,12 +15,12 @@ public class Result {
 
 class BetterResult extends Result {
 
-	public BetterResult(final Integer[] resultIndices, final int count) {
+	public BetterResult(final int[] resultIndices, final int count) {
 		super(resultIndices, count);
 	}
 
 	private BetterResult() {
-		this(new Integer[0], 0);
+		this(new int[0], 0);
 	}
 
 	public static BetterResult none() {

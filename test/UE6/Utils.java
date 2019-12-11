@@ -30,7 +30,7 @@ class Utils {
 	private Utils() {
 	}
 
-	static Result initResult(final Integer count, final Integer... vars) {
+	static Result initResult(final int count, final int... vars) {
 		return new Result(vars, count);
 	}
 }
