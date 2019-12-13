@@ -2,8 +2,8 @@ package UE6;
 
 public class RabinKarp {
 
-	private static final long BASE = 31;
-	private static final long MOD = (2L << 61) - 1; // Mersenne prime
+	private static final int BASE = 31;
+	private static final int MOD = 2 << 30;
 
 	private RabinKarp() {
 	}
@@ -19,14 +19,14 @@ public class RabinKarp {
 		final char[] text = haystack.toCharArray(), pattern = needle.toCharArray();
 		final int m = pattern.length, n = text.length;
 
-		final long hash_p = getHashValue(pattern);
-		long hashText = getHashValue(haystack.substring(0, needle.length()));
+		final int hash_p = getHashValue(pattern);
+		int hashText = getHashValue(haystack.substring(0, needle.length()));
 
 		for (int i = 0; i + m < n; i++) {
 			if (hash_p == hashText && needle.equals(haystack.substring(i, i + m))) {
 				result.found(i);
 			}
-			hashText = rollingHash(hashText, m, text, i);
+			hashText = rollingHash(hashText, m, text[i], text[i + m]);
 		}
 
 		if (hash_p == hashText && needle.equals(haystack.substring(n - m))) {
@@ -35,28 +35,32 @@ public class RabinKarp {
 		return result;
 	}
 
-	private static long getHashValue(final String string) {
+	private static int getHashValue(final String string) {
 		return getHashValue(string.toCharArray());
 	}
 
-	private static long getHashValue(final char[] string) {
-		long result = 0;
+	private static int getHashValue(final char[] string) {
+		int result = 0;
 		for (final char ch : string) {
-			result = result * BASE + ch;
+			result = (result * BASE + ch) % MOD;
 		}
-		return result % MOD;
+		if (result < 0) return result + MOD;
+		return result;
 	}
 
-	private static long rollingHash(final long old, final int m, final char[] text, final int i) {
-		final long hash = (old * BASE - text[i] * pow(m) + text[i + m]) % MOD;
-		return (hash + MOD) % MOD;
+	private static int rollingHash(final int old, final int m, final char oldLetter, final char newLetter) {
+		final int hash = (old * BASE - oldLetter * pow(m) + newLetter) % MOD;
+
+		if (hash < 0) return hash + MOD;
+		return hash;
 	}
 
-	private static long pow(long exp) {
-		long result = 1;
+	private static int pow(int exp) {
+		int result = 1;
 		while (exp-- > 0) {
 			result = result * BASE;
 		}
+		assert result > 0;
 		return result;
 	}
 
