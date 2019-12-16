@@ -2,8 +2,14 @@ package UE7;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Stefan
+ * @author CyberFreak44
+ */
 public class QuadraticHashSetTest {
 
 	private static final int CAPACITY = 10;
@@ -187,4 +193,79 @@ public class QuadraticHashSetTest {
 				hs.toString(),
 				"Exact match not necessary - just in case :P");
 	}
+
+	@Test
+	void testInsertWithoutFullUsage() {
+		for (int i = 0; i < CAPACITY; i++) {
+			if (i < 6)
+				assertTrue(insertAsString(i * CAPACITY + 4), "It should be possible to add up to 6 of these keys");
+			else
+				assertFalse(insertAsString(i * CAPACITY + 4), "Only 6 of these keys should be possible to be stored");
+		}
+		assertEquals(6, hs.size(), "There should be 6 keys stored");
+	}
+
+	@Test
+	void testInsertTerminateOnFull() {
+		for (int i = 0; i < CAPACITY; i++) {
+			insertAsString(i);
+		}
+		assertTimeoutPreemptively(Duration.ofMillis(100), () -> insertAsString(13),
+				"The method should eventually terminate.");
+	}
+
+	@Test
+	void testNotContainTerminateOnFull() {
+		for (int i = 0; i < CAPACITY; i++) {
+			insertAsString(i);
+		}
+		assertTimeoutPreemptively(Duration.ofMillis(100), () -> hs.contains(13),
+				"The method should eventually terminate.");
+	}
+
+	@Test
+	void testCantRemoveTerminateOnFull() {
+		for (int i = 0; i < CAPACITY; i++) {
+			insertAsString(i);
+		}
+		assertTimeoutPreemptively(Duration.ofMillis(100), () -> hs.remove(13),
+				"The method should eventually terminate.");
+	}
+
+	@Test
+	void testRemoveWithMultiProbing() {
+		for (int i = 0; i < CAPACITY; i++) {
+			insertAsString(i * 10);
+		}
+		for (int i = 0; i < CAPACITY; i++) {
+			if (i < 6) assertTrue(hs.remove(i * 10), "This key should be present.");
+			else assertFalse(hs.remove(i * 10), "This key shouldn't be present.");
+		}
+	}
+
+	@Test
+	void testInsertNegativeKey() {
+		for (int i = 0; i < CAPACITY; i++) {
+			assertTrue(insertAsString(-i), "Negative keys also should be treated right.");
+		}
+	}
+
+	@Test
+	void testContainNegativeKey() {
+		for (int i = 0; i < CAPACITY; i++) {
+			insertAsString(-i);
+		}
+		assertTrue(hs.contains(-4), "Key not found.");
+	}
+
+	@Test
+	void removeRemoveNegativeKey() {
+		for (int i = 0; i < CAPACITY; i++) {
+			insertAsString(-i);
+		}
+		for (int i = 0; i < CAPACITY; i++) {
+			assertTrue(hs.remove(-i), "Key not found.");
+		}
+	}
 }
+
