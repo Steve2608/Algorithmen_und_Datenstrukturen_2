@@ -58,9 +58,9 @@ public class RabinKarp {
 	private static int pow(int exp) {
 		int result = 1;
 		while (exp-- > 0) {
-			result = result * BASE;
+			result = (result * BASE) % MOD;
 		}
-		assert result > 0;
+		if (result < 0) return result + MOD;
 		return result;
 	}
 
