@@ -48,31 +48,33 @@ public class Graph {
 		vertices[nVertices++] = v;
 	}
 
-	public boolean hasEdge(int v1, int v2) throws IllegalArgumentException {
+	public int hasEdge(int v1, int v2) throws IllegalArgumentException {
 		checkEdge(v1, v2);
-		return hasEdge(new Edge(v1, v2));
+		return hasEdge(new Edge(v1, v2, -1));
 	}
 
-	private boolean hasEdge(Edge e) {
+	private int hasEdge(Edge e) {
 		for (int i = 0; i < nEdges; i++) {
 			if (e.equals(edges[i])) {
-				return true;
+				return edges[i].weight;
 			}
 		}
-		return false;
+		return -1;
 	}
 
-	public boolean hasUndirectedEdge(int v1, int v2) {
+	public int hasUndirectedEdge(int v1, int v2) {
 		checkEdge(v1, v2);
-		return hasEdge(new UndirectedEdge(v1, v2));
+		return hasEdge(new UndirectedEdge(v1, v2, -1));
 	}
 
-	public boolean insertEdge(int v1, int v2) throws IllegalArgumentException {
+	public boolean insertEdge(int v1, int v2, int weight) throws IllegalArgumentException {
 		checkEdge(v1, v2);
+		if (weight < 0) throw new IllegalArgumentException("Weight has to be positive");
 
-		final Edge e = new Edge(v1, v2);
+		final Edge e = new Edge(v1, v2, weight);
 		// checking if edge already exists
-		for (int i = 0; i < nEdges; i++) {
+		int i;
+		for (i = 0; i < nEdges; i++) {
 			if (e.equals(edges[i])) {
 				return false;
 			}
@@ -96,7 +98,7 @@ public class Graph {
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
 				// Setting to zero is not actually necessary because JVM already does that
-				matrix[i][j] = (i != j && hasEdge(i, j)) ? 1 : 0;
+				matrix[i][j] = (i != j && hasEdge(i, j) >= 0) ? 1 : 0;
 			}
 		}
 		return matrix;
@@ -110,7 +112,7 @@ public class Graph {
 		final MyVertex[] adjacent = new MyVertex[nVertices - 1];
 		int cnt = 0;
 		for (int i = 0; i < nVertices; i++) {
-			if (v != i && hasEdge(v, i)) {
+			if (v != i && hasEdge(v, i) >= 0) {
 				adjacent[cnt++] = vertices[i];
 			}
 		}
@@ -137,7 +139,7 @@ public class Graph {
 
 	private void DFS(boolean[] visited, int self, int component) {
 		for (int i = 0; i < nVertices; i++) {
-			if (i != self && hasUndirectedEdge(i, self)) {
+			if (i != self && hasUndirectedEdge(i, self) >= 0) {
 				if (visited[i]) {
 					isCyclic = true;
 				} else {
@@ -190,11 +192,13 @@ public class Graph {
 
 	protected static class Edge {
 
-		public int out, in;
+		protected final int out, in;
+		protected final int weight;
 
-		public Edge(int out, int in) {
+		public Edge(int out, int in, int weight) {
 			this.out = out;
 			this.in = in;
+			this.weight = weight;
 		}
 
 		@Override
@@ -212,8 +216,8 @@ public class Graph {
 
 	private static class UndirectedEdge extends Edge {
 
-		public UndirectedEdge(int out, int in) {
-			super(out, in);
+		public UndirectedEdge(int out, int in, int weight) {
+			super(out, in, weight);
 		}
 
 		@Override

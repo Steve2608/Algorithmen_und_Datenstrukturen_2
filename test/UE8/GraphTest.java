@@ -63,12 +63,12 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
 
-		graph.insertEdge(0, 1);
-		assertTrue(graph.hasEdge(0, 1));
-		assertFalse(graph.hasEdge(1, 0));
+		graph.insertEdge(0, 1, 2);
+		assertEquals(2, graph.hasEdge(0, 1));
+		assertEquals(-1, graph.hasEdge(1, 0), "Graph is directed");
 
 		graph.hasEdge(0, 2);
-		assertFalse(graph.hasEdge(1, 2));
+		assertEquals(-1, graph.hasEdge(1, 2));
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 
-		assertThrows(IllegalArgumentException.class, () -> graph.insertEdge(1, 2));
+		assertThrows(IllegalArgumentException.class, () -> graph.insertEdge(1, 2, 0));
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 
-		assertThrows(IllegalArgumentException.class, () -> graph.insertEdge(1, 1));
+		assertThrows(IllegalArgumentException.class, () -> graph.insertEdge(1, 1, 0));
 	}
 
 	@Test
@@ -93,11 +93,11 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
 
-		assertTrue(graph.insertEdge(0, 1));
-		assertTrue(graph.insertEdge(0, 2));
-		assertTrue(graph.insertEdge(2, 1));
-		assertTrue(graph.insertEdge(1, 2));
-		assertFalse(graph.insertEdge(1, 2));
+		assertTrue(graph.insertEdge(0, 1, 0));
+		assertTrue(graph.insertEdge(0, 2, 0));
+		assertTrue(graph.insertEdge(2, 1, 0));
+		assertTrue(graph.insertEdge(1, 2, 0));
+		assertFalse(graph.insertEdge(1, 2, 0));
 	}
 
 	@Test
@@ -107,10 +107,10 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("2"));
 		graph.insertVertex(new Vertex("3"));
 
-		graph.insertEdge(0, 1);
-		graph.insertEdge(3, 1);
-		graph.insertEdge(3, 2);
-		graph.insertEdge(2, 3);
+		graph.insertEdge(0, 1, 0);
+		graph.insertEdge(3, 1, 0);
+		graph.insertEdge(3, 2, 0);
+		graph.insertEdge(2, 3, 0);
 
 		int[][] adjacencyMatrix = graph.getAdjacencyMatrix();
 		assertEquals(0, adjacencyMatrix[0][0]);
@@ -149,11 +149,11 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("4"));
 		graph.insertVertex(new Vertex("5"));
 
-		graph.insertEdge(0, 1);
-		graph.insertEdge(2, 1);
-		graph.insertEdge(4, 5);
-		graph.insertEdge(0, 4);
-		graph.insertEdge(2, 0);
+		graph.insertEdge(0, 1, 0);
+		graph.insertEdge(2, 1, 0);
+		graph.insertEdge(4, 5, 0);
+		graph.insertEdge(0, 4, 0);
+		graph.insertEdge(2, 0, 0);
 
 		assertArrayEquals(new Vertex[]{new Vertex("1"), new Vertex("4")}, graph.getAdjacentVertices(0));
 	}
@@ -164,7 +164,7 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
 
-		graph.insertEdge(2, 1);
+		graph.insertEdge(2, 1, 0);
 
 		assertArrayEquals(new Vertex[0], graph.getAdjacentVertices(0));
 	}
@@ -195,13 +195,13 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("4"));
 		graph.insertVertex(new Vertex("5"));
 
-		graph.insertEdge(0, 1);
-		graph.insertEdge(2, 1);
-		graph.insertEdge(4, 5);
-		graph.insertEdge(0, 4);
-		graph.insertEdge(0, 2);
-		graph.insertEdge(3, 2);
-		graph.insertEdge(1, 5);
+		graph.insertEdge(0, 1, 0);
+		graph.insertEdge(2, 1, 0);
+		graph.insertEdge(4, 5, 0);
+		graph.insertEdge(0, 4, 0);
+		graph.insertEdge(0, 2, 0);
+		graph.insertEdge(3, 2, 0);
+		graph.insertEdge(1, 5, 0);
 
 		assertTrue(graph.isConnected());
 	}
@@ -211,7 +211,7 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 
-		graph.insertEdge(0, 1);
+		graph.insertEdge(0, 1, 0);
 		assertTrue(graph.isConnected());
 
 		graph.insertVertex(new Vertex("2"));
@@ -238,20 +238,20 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("4"));
 		graph.insertVertex(new Vertex("5"));
 
-		graph.insertEdge(0, 1);
-		graph.insertEdge(2, 1);
-		graph.insertEdge(4, 5);
-		graph.insertEdge(0, 4);
+		graph.insertEdge(0, 1, 0);
+		graph.insertEdge(2, 1, 0);
+		graph.insertEdge(4, 5, 0);
+		graph.insertEdge(0, 4, 0);
 
 		assertEquals(2, graph.getNumberOfComponents());
 
 		graph.insertVertex(new Vertex("6"));
 		assertEquals(3, graph.getNumberOfComponents());
 
-		graph.insertEdge(6, 4);
+		graph.insertEdge(6, 4, 0);
 		assertEquals(2, graph.getNumberOfComponents());
 
-		graph.insertEdge(3, 6);
+		graph.insertEdge(3, 6, 0);
 		assertEquals(1, graph.getNumberOfComponents());
 	}
 
@@ -267,19 +267,19 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("2"));
 		graph.insertVertex(new Vertex("3"));
 
-		graph.insertEdge(0, 1);
-		graph.insertEdge(1, 2);
-		graph.insertEdge(2, 3);
-		graph.insertEdge(3, 0);
+		graph.insertEdge(0, 1, 0);
+		graph.insertEdge(1, 2, 0);
+		graph.insertEdge(2, 3, 0);
+		graph.insertEdge(3, 0, 0);
 
 		assertTrue(graph.isCyclic());
 
 		graph.insertVertex(new Vertex("4"));
 
 		graph.insertVertex(new Vertex("5"));
-		graph.insertEdge(3, 4);
-		graph.insertEdge(4, 5);
-		graph.insertEdge(5, 0);
+		graph.insertEdge(3, 4, 0);
+		graph.insertEdge(4, 5, 0);
+		graph.insertEdge(5, 0, 0);
 		assertTrue(graph.isCyclic());
 	}
 
