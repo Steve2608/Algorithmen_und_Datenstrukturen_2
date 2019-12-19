@@ -25,6 +25,11 @@ public class QuadraticHashSet extends AbstractHashSet implements MyHashSet {
 		}
 	}
 
+	public int getHashCode(final int key) {
+		final int hash = getHashCode(key, elems.length);
+		return hash < 0 ? hash + elems.length : hash;
+	}
+
 	private int offset(final int n) {
 		final int temp = (n + 1) / 2;
 		final int ret = temp * temp;
@@ -48,7 +53,7 @@ public class QuadraticHashSet extends AbstractHashSet implements MyHashSet {
 			throw new IllegalArgumentException("Cannot insert null key");
 		if (contains(key)) return false;
 
-		final int hc = getHashCode(key, elems.length);
+		final int hc = getHashCode(key);
 		int n, tries;
 		for (n = 0, tries = 0; elems[index(hc + offset(n))].removed && tries < CAPACITY; n++, tries++)
 			;

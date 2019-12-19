@@ -18,6 +18,11 @@ public class ChainingHashSet extends AbstractHashSet implements MyHashSet {
 		this(10);
 	}
 
+	public int getHashCode(final int key) {
+		final int hash = getHashCode(key, elems.length);
+		return hash < 0 ? hash + elems.length : hash;
+	}
+
 	@Override
 	public int size() {
 		return size;
@@ -29,7 +34,7 @@ public class ChainingHashSet extends AbstractHashSet implements MyHashSet {
 			throw new IllegalArgumentException("Parameters cannot be null");
 		if (contains(key)) return false;
 
-		final int index = getHashCode(key, elems.length);
+		final int index = getHashCode(key);
 		if (elems[index] == null) {
 			elems[index] = new ChainingHashNode(key, data);
 		} else {
@@ -47,7 +52,7 @@ public class ChainingHashSet extends AbstractHashSet implements MyHashSet {
 	public boolean contains(final Integer key) throws IllegalArgumentException {
 		if (key == null) throw new IllegalArgumentException("Parameters cannot be null");
 
-		for (ChainingHashNode curr = elems[getHashCode(key, elems.length)]; curr != null; curr = curr.next) {
+		for (ChainingHashNode curr = elems[getHashCode(key)]; curr != null; curr = curr.next) {
 			if (key.equals(curr.key)) return true;
 		}
 		return false;
@@ -58,7 +63,7 @@ public class ChainingHashSet extends AbstractHashSet implements MyHashSet {
 		if (key == null) throw new IllegalArgumentException("Parameters cannot be null");
 		if (!contains(key)) return false;
 
-		final int index = getHashCode(key, elems.length);
+		final int index = getHashCode(key);
 		if (key.equals(elems[index].key)) {
 			elems[index] = elems[index].next;
 		} else {
