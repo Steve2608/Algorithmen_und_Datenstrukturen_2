@@ -54,10 +54,10 @@ public class QuadraticHashSet extends AbstractHashSet implements MyHashSet {
 		if (contains(key)) return false;
 
 		final int hc = getHashCode(key);
-		int n, tries;
-		for (n = 0, tries = 0; elems[index(hc + offset(n))].removed && tries < CAPACITY; n++, tries++)
+		int n;
+		for (n = 0; elems[index(hc + offset(n))].removed && n < CAPACITY; n++)
 			;
-		if (tries > CAPACITY || elems[index(hc + offset(n))].removed) return false;
+		if (n > CAPACITY || elems[index(hc + offset(n))].removed) return false;
 
 		final OpenHashNode insert = elems[index(hc + offset(n))];
 		insert.key = key;

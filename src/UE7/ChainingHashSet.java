@@ -1,17 +1,16 @@
 package UE7;
 
+import java.util.Arrays;
 import java.util.StringJoiner;
 
 public class ChainingHashSet extends AbstractHashSet implements MyHashSet {
 
 	private final ChainingHashNode[] elems;
-	private final int CAPACITY;
 	private int size = 0;
 
 	public ChainingHashSet(final int capacity) {
 		if (capacity <= 0) throw new IllegalArgumentException("Capacity cannot be negative");
 		elems = new ChainingHashNode[capacity];
-		CAPACITY = capacity;
 	}
 
 	public ChainingHashSet() {
@@ -80,9 +79,7 @@ public class ChainingHashSet extends AbstractHashSet implements MyHashSet {
 	@Override
 	public void clear() {
 		size = 0;
-		for (int i = 0; i < CAPACITY; i++) {
-			elems[i] = null;
-		}
+		Arrays.fill(elems, null);
 	}
 
 	@Override
