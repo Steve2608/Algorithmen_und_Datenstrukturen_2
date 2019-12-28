@@ -28,7 +28,7 @@ public class Graph {
 		return result;
 	}
 
-	public int insertVertex(MyVertex v) throws IllegalArgumentException {
+	public int insertVertex(final MyVertex v) throws IllegalArgumentException {
 		if (v == null) throw new IllegalArgumentException("Cannot insert null-Element");
 
 		for (int i = 0; i < getNumberOfVertices(); i++) {
@@ -39,7 +39,7 @@ public class Graph {
 		return nVertices - 1;
 	}
 
-	private void addVertex(MyVertex v) {
+	private void addVertex(final MyVertex v) {
 		if (nVertices >= vertices.length) {
 			final int doubleSize = vertices.length * 2;
 			vertices = Arrays.copyOf(vertices, doubleSize);
@@ -48,12 +48,12 @@ public class Graph {
 		vertices[nVertices++] = v;
 	}
 
-	public int hasEdge(int v1, int v2) throws IllegalArgumentException {
+	public int hasEdge(final int v1, final int v2) throws IllegalArgumentException {
 		checkEdge(v1, v2);
 		return hasEdge(new Edge(v1, v2, -1));
 	}
 
-	private int hasEdge(Edge e) {
+	private int hasEdge(final Edge e) {
 		for (int i = 0; i < nEdges; i++) {
 			if (e.equals(edges[i])) {
 				return edges[i].weight;
@@ -62,12 +62,12 @@ public class Graph {
 		return -1;
 	}
 
-	public int hasUndirectedEdge(int v1, int v2) {
+	public int hasUndirectedEdge(final int v1, final int v2) {
 		checkEdge(v1, v2);
 		return hasEdge(new UndirectedEdge(v1, v2, -1));
 	}
 
-	public boolean insertEdge(int v1, int v2, int weight) throws IllegalArgumentException {
+	public boolean insertEdge(final int v1, final int v2, final int weight) throws IllegalArgumentException {
 		checkEdge(v1, v2);
 		if (weight < 0) throw new IllegalArgumentException("Weight has to be positive");
 
@@ -84,7 +84,7 @@ public class Graph {
 		return true;
 	}
 
-	private void checkEdge(int v1, int v2) {
+	private void checkEdge(final int v1, final int v2) {
 		if (v1 == v2) throw new IllegalArgumentException("Ident vertex indices (v1= " + v1 + " | v2= " + v2 + ")");
 		if (v1 < 0 || v1 >= vertices.length) throw new IllegalArgumentException("Invalid Index (v1=" + v1 + ")");
 		if (v2 < 0 || v2 >= vertices.length) throw new IllegalArgumentException("Invalid Index (v2=" + v2 + ")");
@@ -98,13 +98,13 @@ public class Graph {
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
 				// Setting to zero is not actually necessary because JVM already does that
-				matrix[i][j] = (i != j && hasEdge(i, j) >= 0) ? 1 : 0;
+				matrix[i][j] = i != j && hasEdge(i, j) >= 0 ? 1 : 0;
 			}
 		}
 		return matrix;
 	}
 
-	public MyVertex[] getAdjacentVertices(int v) throws IllegalArgumentException {
+	public MyVertex[] getAdjacentVertices(final int v) throws IllegalArgumentException {
 		if (v < 0 || v >= vertices.length) throw new IllegalArgumentException("Invalid Index (v=" + v + ")");
 		if (vertices[v] == null) throw new IllegalArgumentException("Specified vertex is unknown (v=" + v + ")");
 
@@ -137,7 +137,7 @@ public class Graph {
 		}
 	}
 
-	private void DFS(boolean[] visited, int self, int component) {
+	private void DFS(final boolean[] visited, final int self, final int component) {
 		for (int i = 0; i < nVertices; i++) {
 			if (i != self && hasUndirectedEdge(i, self) >= 0) {
 				if (visited[i]) {
@@ -181,7 +181,7 @@ public class Graph {
 		return sb.toString();
 	}
 
-	private String component(int index) {
+	private String component(final int index) {
 		final StringBuilder s = new StringBuilder();
 		s.append("Component #").append(index + 1).append(" : ");
 		for (int i = 0; i < components.get(index).size(); i++) {
@@ -195,40 +195,62 @@ public class Graph {
 		protected final int out, in;
 		protected final int weight;
 
-		public Edge(int out, int in, int weight) {
+		public Edge(final int out, final int in, final int weight) {
 			this.out = out;
 			this.in = in;
 			this.weight = weight;
 		}
 
 		@Override
-		public boolean equals(Object other) {
+		public boolean equals(final Object other) {
 			if (other == null) return false;
 			if (this == other) return true;
 
-			if (other.getClass() != this.getClass()) return false;
+			if (other.getClass() != getClass()) return false;
 
 			final Edge e = (Edge) other;
-			return this.in == e.in && this.out == e.out;
+			return in == e.in && out == e.out;
 		}
 
+		@Override
+		public int hashCode() {
+			int result = out;
+			result = 31 * result + in;
+			result = 31 * result + weight;
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%d--(%d)->%d", out, weight, in);
+		}
 	}
 
 	private static class UndirectedEdge extends Edge {
 
-		public UndirectedEdge(int out, int in, int weight) {
+		public UndirectedEdge(final int out, final int in, final int weight) {
 			super(out, in, weight);
 		}
 
 		@Override
-		public boolean equals(Object other) {
+		public boolean equals(final Object other) {
 			if (other == null) return false;
 			if (this == other) return true;
 
 			if (!(other instanceof Edge)) return false;
 
 			final Edge e = (Edge) other;
-			return this.in == e.in && this.out == e.out || this.in == e.out && this.out == e.in;
+			return in == e.in && out == e.out || in == e.out && out == e.in;
+		}
+
+		@Override
+		public int hashCode() {
+			return super.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%d--(%d)--%d", out, weight, in);
 		}
 	}
 
