@@ -7,7 +7,7 @@ import java.util.List;
 public class Graph {
 
 	protected MyVertex[] vertices = new MyVertex[1];
-	protected Edge[] edges = new Edge[0];
+	protected DirectedEdge[] directedEdges = new DirectedEdge[0];
 
 	// pointers for first free Index of Array since there is NO way to remove vertices
 	private int nVertices = 0;
@@ -43,20 +43,20 @@ public class Graph {
 		if (nVertices >= vertices.length) {
 			final int doubleSize = vertices.length * 2;
 			vertices = Arrays.copyOf(vertices, doubleSize);
-			edges = Arrays.copyOf(edges, doubleSize * (doubleSize - 1));
+			directedEdges = Arrays.copyOf(directedEdges, doubleSize * (doubleSize - 1));
 		}
 		vertices[nVertices++] = v;
 	}
 
 	public int hasEdge(final int v1, final int v2) throws IllegalArgumentException {
 		checkEdge(v1, v2);
-		return hasEdge(new Edge(v1, v2, -1));
+		return hasEdge(new DirectedEdge(v1, v2, -1));
 	}
 
-	private int hasEdge(final Edge e) {
+	private int hasEdge(final MyEdge e) {
 		for (int i = 0; i < nEdges; i++) {
-			if (e.equals(edges[i])) {
-				return edges[i].weight;
+			if (e.equals(directedEdges[i])) {
+				return directedEdges[i].weight;
 			}
 		}
 		return -1;
@@ -71,16 +71,16 @@ public class Graph {
 		checkEdge(v1, v2);
 		if (weight < 0) throw new IllegalArgumentException("Weight has to be positive");
 
-		final Edge e = new Edge(v1, v2, weight);
+		final DirectedEdge e = new DirectedEdge(v1, v2, weight);
 		// checking if edge already exists
 		int i;
 		for (i = 0; i < nEdges; i++) {
-			if (e.equals(edges[i])) {
+			if (e.equals(directedEdges[i])) {
 				return false;
 			}
 		}
 
-		edges[nEdges++] = e;
+		directedEdges[nEdges++] = e;
 		return true;
 	}
 
@@ -90,6 +90,10 @@ public class Graph {
 		if (v2 < 0 || v2 >= vertices.length) throw new IllegalArgumentException("Invalid Index (v2=" + v2 + ")");
 		if (vertices[v1] == null) throw new IllegalArgumentException("Specified vertex is unknown (v1=" + v1 + ")");
 		if (vertices[v2] == null) throw new IllegalArgumentException("Specified vertex is unknown (v2=" + v2 + ")");
+	}
+
+	public MyEdge[] getEdges() {
+		return Arrays.copyOf(directedEdges, nEdges);
 	}
 
 	public int[][] getAdjacencyMatrix() {
@@ -190,12 +194,9 @@ public class Graph {
 		return s.append("\n").toString();
 	}
 
-	protected static class Edge {
+	protected static class DirectedEdge extends MyEdge {
 
-		protected final int out, in;
-		protected final int weight;
-
-		public Edge(final int out, final int in, final int weight) {
+		public DirectedEdge(final int out, final int in, final int weight) {
 			this.out = out;
 			this.in = in;
 			this.weight = weight;
@@ -208,7 +209,7 @@ public class Graph {
 
 			if (other.getClass() != getClass()) return false;
 
-			final Edge e = (Edge) other;
+			final DirectedEdge e = (DirectedEdge) other;
 			return in == e.in && out == e.out;
 		}
 
@@ -226,7 +227,7 @@ public class Graph {
 		}
 	}
 
-	private static class UndirectedEdge extends Edge {
+	private static class UndirectedEdge extends DirectedEdge {
 
 		public UndirectedEdge(final int out, final int in, final int weight) {
 			super(out, in, weight);
@@ -237,9 +238,9 @@ public class Graph {
 			if (other == null) return false;
 			if (this == other) return true;
 
-			if (!(other instanceof Edge)) return false;
+			if (!(other instanceof DirectedEdge)) return false;
 
-			final Edge e = (Edge) other;
+			final DirectedEdge e = (DirectedEdge) other;
 			return in == e.in && out == e.out || in == e.out && out == e.in;
 		}
 

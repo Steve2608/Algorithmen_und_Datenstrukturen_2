@@ -9,10 +9,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GraphTest {
 
+	/**
+	 * Fields of <tt>MyEdge</tt> are to be interpreted as:
+	 * <tt>in</tt>... to
+	 * <tt>out</tt>... from
+	 */
+	private static final boolean OUT_IS_FROM__IN_IS_TO = true;
+
 	private final Graph graph = new Graph();
 
 	@Test
-	public void getNumberOfVertices() {
+	void testGetNumberOfVertices() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -21,12 +28,12 @@ public class GraphTest {
 	}
 
 	@Test
-	public void getNumberOfVerticesBeforeInsert() {
+	void testGetNumberOfVerticesBeforeInsert() {
 		assertEquals(0, graph.getNumberOfVertices());
 	}
 
 	@Test
-	public void getVertices() {
+	void testGetVertices() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 
@@ -34,31 +41,31 @@ public class GraphTest {
 	}
 
 	@Test
-	public void getVerticesBeforeInsert() {
+	void testGetVerticesBeforeInsert() {
 		assertArrayEquals(new Vertex[0], graph.getVertices());
 	}
 
 	@Test
-	public void insertVertex() {
+	void testInsertVertex() {
 		assertEquals(0, graph.insertVertex(new Vertex("0")));
 		assertEquals(1, graph.insertVertex(new Vertex("1")));
 		assertEquals(2, graph.insertVertex(new Vertex("2")));
 	}
 
 	@Test
-	public void insertDuplicateVertex() {
+	void testInsertDuplicateVertex() {
 		graph.insertVertex(new Vertex("0"));
 		assertTrue(graph.insertVertex(new Vertex("0")) < 0);
 	}
 
 	@Test
-	public void insertNullVertex() {
+	void testInsertNullVertex() {
 		assertThrows(IllegalArgumentException.class, () -> graph.insertVertex(null));
 		assertEquals(0, graph.getNumberOfVertices());
 	}
 
 	@Test
-	public void hasEdge() {
+	void testHasEdge() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -72,7 +79,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void hasEdgeInvalidIndex() {
+	void testHasEdgeInvalidIndex() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 
@@ -80,7 +87,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void hasEdgeSelf() {
+	void testHasEdgeSelf() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 
@@ -88,7 +95,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void insertEdge() {
+	void testInsertEdge() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -101,7 +108,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void getAdjacencyMatrix() {
+	void testGetAdjacencyMatrix() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -112,7 +119,7 @@ public class GraphTest {
 		graph.insertEdge(3, 2, 0);
 		graph.insertEdge(2, 3, 0);
 
-		int[][] adjacencyMatrix = graph.getAdjacencyMatrix();
+		final int[][] adjacencyMatrix = graph.getAdjacencyMatrix();
 		assertEquals(0, adjacencyMatrix[0][0]);
 		assertEquals(1, adjacencyMatrix[0][1]);
 		assertEquals(0, adjacencyMatrix[0][2]);
@@ -135,13 +142,13 @@ public class GraphTest {
 	}
 
 	@Test
-	public void getAdjacencyMatrixEmpty() {
-		int[][] adjacent = graph.getAdjacencyMatrix();
+	void testGetAdjacencyMatrixEmpty() {
+		final int[][] adjacent = graph.getAdjacencyMatrix();
 		assertEquals(0, adjacent.length);
 	}
 
 	@Test
-	public void getAdjacentVertices() {
+	void testGetAdjacentVertices() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -159,7 +166,41 @@ public class GraphTest {
 	}
 
 	@Test
-	public void getAdjacentVerticesNoneAdjacent() {
+	void testGetEdges() {
+		assertNotNull(graph.getEdges(), "Array must not be null");
+		assertEquals(0, graph.getEdges().length, "Empty edges must be of size 0");
+
+		graph.insertVertex(new Vertex("0"));
+		graph.insertVertex(new Vertex("1"));
+		graph.insertVertex(new Vertex("2"));
+		graph.insertVertex(new Vertex("3"));
+		graph.insertVertex(new Vertex("4"));
+		graph.insertVertex(new Vertex("5"));
+
+		graph.insertEdge(0, 1, 2);
+		graph.insertEdge(2, 1, 8);
+		graph.insertEdge(4, 5, 9);
+		graph.insertEdge(0, 4, 3);
+		graph.insertEdge(2, 0, 7);
+
+		final MyEdge[] edges = graph.getEdges();
+		assertNotNull(edges, "Array must not be null");
+		assertEquals(5, edges.length, "Only return Array up to nEdges!");
+		assertArrayEquals(new MyEdge[]{
+				createEdge(0, 1, 2),
+				createEdge(2, 1, 8),
+				createEdge(4, 5, 9),
+				createEdge(0, 4, 3),
+				createEdge(2, 0, 7)
+		}, edges, "Edges created incorrectly; have you tried flipping OUT_IS_FROM__IN_IS_TO?");
+	}
+
+	private MyEdge createEdge(final int v1, final int v2, final int weight) {
+		return OUT_IS_FROM__IN_IS_TO ? new Edge(v1, v2, weight) : new Edge(v2, v1, weight);
+	}
+
+	@Test
+	void testGetAdjacentVerticesNoneAdjacent() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -170,12 +211,12 @@ public class GraphTest {
 	}
 
 	@Test
-	public void getAdjacentVerticesEmpty() {
+	void testGetAdjacentVerticesEmpty() {
 		assertThrows(IllegalArgumentException.class, () -> graph.getAdjacentVertices(0));
 	}
 
 	@Test
-	public void getAdjacentVerticesInvalidIndex() {
+	void testGetAdjacentVerticesInvalidIndex() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -187,7 +228,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void isConnected() {
+	void testIsConnected() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -207,7 +248,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void isNotConnected() {
+	void testIsNotConnected() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 
@@ -219,18 +260,18 @@ public class GraphTest {
 	}
 
 	@Test
-	public void isConnectedEmpty() {
+	void testIsConnectedEmpty() {
 		assertFalse(graph.isConnected());
 	}
 
 	@Test
-	public void isConnectedOneVertex() {
+	void testIsConnectedOneVertex() {
 		graph.insertVertex(new Vertex("0"));
 		assertTrue(graph.isConnected());
 	}
 
 	@Test
-	public void getNumberOfComponents() {
+	void testGetNumberOfComponents() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -256,12 +297,12 @@ public class GraphTest {
 	}
 
 	@Test
-	public void getNumberOfComponentsEmpty() {
+	void testGetNumberOfComponentsEmpty() {
 		assertEquals(0, graph.getNumberOfComponents());
 	}
 
 	@Test
-	public void isCyclic() {
+	void testIsCyclic() {
 		graph.insertVertex(new Vertex("0"));
 		graph.insertVertex(new Vertex("1"));
 		graph.insertVertex(new Vertex("2"));
@@ -284,12 +325,12 @@ public class GraphTest {
 	}
 
 	@Test
-	public void isCyclicEmpty() {
+	void testIsCyclicEmpty() {
 		assertFalse(graph.isCyclic());
 	}
 
 	@Test
-	public void isCyclicOneVertex() {
+	void testIsCyclicOneVertex() {
 		graph.insertVertex(new Vertex("0"));
 		assertFalse(graph.isCyclic());
 	}
@@ -297,26 +338,55 @@ public class GraphTest {
 	private static class Vertex implements MyVertex {
 		private final String name;
 
-		public Vertex(String name) {
+		private Vertex(final String name) {
 			this.name = name;
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			final Vertex vertex = (Vertex) o;
+			return Objects.equals(name, vertex.name);
+		}
+
+		@Override
+		public int hashCode() {
+			return name.hashCode();
 		}
 
 		@Override
 		public String toString() {
 			return String.format("Vertex{'%s'}", name);
 		}
+	}
+
+	private static class Edge extends MyEdge {
+		private Edge(final int from, final int to, final int weight) {
+			out = from;
+			in = to;
+			this.weight = weight;
+		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			Vertex vertex = (Vertex) o;
-			return Objects.equals(name, vertex.name);
+		public boolean equals(final Object obj) {
+			if (!(obj instanceof MyEdge)) return false;
+
+			final MyEdge other = (MyEdge) obj;
+			return in == other.in && out == other.out && weight == other.weight;
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(name);
+			int result = out;
+			result = 31 * result + in;
+			result = 31 * result + weight;
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%d--(%d)->%d", out, weight, in);
 		}
 	}
 
