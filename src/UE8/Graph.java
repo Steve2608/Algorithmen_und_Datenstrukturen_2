@@ -3,6 +3,7 @@ package UE8;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 public class Graph {
 
@@ -113,15 +114,29 @@ public class Graph {
 		if (vertices[v] == null) throw new IllegalArgumentException("Specified vertex is unknown (v=" + v + ")");
 
 		// creating biggest possible array
-		final MyVertex[] adjacent = new MyVertex[nVertices - 1];
-		int cnt = 0;
+		final Adjacency adjacency = getAdjacentBitVector(v, (a, b) -> hasEdge(a, b) >= 0);
+		final MyVertex[] adj = new MyVertex[adjacency.count];
+
+		int count = 0;
 		for (int i = 0; i < nVertices; i++) {
-			if (v != i && hasEdge(v, i) >= 0) {
-				adjacent[cnt++] = vertices[i];
+			if (adjacency.vertices[i]) {
+				adj[count++] = vertices[i];
 			}
 		}
-		// Fitting to correct size
-		return cnt == adjacent.length ? adjacent : Arrays.copyOf(adjacent, cnt);
+
+		return adj;
+	}
+
+	private Adjacency getAdjacentBitVector(final int v, final BiPredicate<Integer, Integer> p) {
+		final boolean[] adjacent = new boolean[nVertices];
+		int count = 0;
+		for (int i = 0; i < nVertices; i++) {
+			if (i != v && p.test(v, i)) {
+				adjacent[i] = true;
+				count++;
+			}
+		}
+		return new Adjacency(adjacent, count);
 	}
 
 	private void DFS() {
@@ -136,20 +151,22 @@ public class Graph {
 				components.add(new ArrayList<>());
 				components.get(component).add(i);
 				visited[i] = true;
-				DFS(visited, i, component++);
+				DFS(visited, i, -1, component++);
 			}
 		}
 	}
 
-	private void DFS(final boolean[] visited, final int self, final int component) {
+	private void DFS(final boolean[] visited, final int child, final int par, final int component) {
+		final boolean[] adjacent = getAdjacentBitVector(child, (a, b) -> hasUndirectedEdge(a, b) >= 0).vertices;
+
 		for (int i = 0; i < nVertices; i++) {
-			if (i != self && hasUndirectedEdge(i, self) >= 0) {
-				if (visited[i]) {
+			if (adjacent[i] && i != child && i != par && hasUndirectedEdge(child, i) >= 0) {
+				if (components.get(component).contains(i)) {
 					isCyclic = true;
 				} else {
 					visited[i] = true;
 					components.get(component).add(i);
-					DFS(visited, i, component);
+					DFS(visited, i, child, component);
 				}
 			}
 		}
@@ -192,6 +209,26 @@ public class Graph {
 			s.append(components.get(index).get(i)).append(" | ");
 		}
 		return s.append("\n").toString();
+	}
+
+	private static final class Adjacency {
+		private final boolean[] vertices;
+		private final int count;
+
+		private Adjacency(final boolean[] vertices) {
+			this.vertices = vertices;
+
+			int count = 0;
+			for (final boolean vertex : vertices) {
+				if (vertex) count++;
+			}
+			this.count = count;
+		}
+
+		public Adjacency(final boolean[] vertices, final int count) {
+			this.vertices = vertices;
+			this.count = count;
+		}
 	}
 
 	protected static class DirectedEdge extends MyEdge {
