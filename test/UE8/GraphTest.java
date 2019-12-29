@@ -2,6 +2,7 @@ package UE8;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,7 +15,7 @@ public class GraphTest {
 	 * <tt>in</tt>... to
 	 * <tt>out</tt>... from
 	 */
-	private static final boolean OUT_IS_FROM__IN_IS_TO = true;
+	private static final boolean OUT_IS_FROM_VERTEX__IN_IS_TO_VERTEX = true;
 
 	private final Graph graph = new Graph();
 
@@ -196,7 +197,7 @@ public class GraphTest {
 	}
 
 	private MyEdge createEdge(final int v1, final int v2, final int weight) {
-		return OUT_IS_FROM__IN_IS_TO ? new Edge(v1, v2, weight) : new Edge(v2, v1, weight);
+		return OUT_IS_FROM_VERTEX__IN_IS_TO_VERTEX ? new Edge(v1, v2, weight) : new Edge(v2, v1, weight);
 	}
 
 	@Test
@@ -243,6 +244,8 @@ public class GraphTest {
 		graph.insertEdge(0, 2, 0);
 		graph.insertEdge(3, 2, 0);
 		graph.insertEdge(1, 5, 0);
+
+		System.out.println(Arrays.toString(graph.getEdges()));
 
 		assertTrue(graph.isConnected());
 	}
@@ -332,6 +335,32 @@ public class GraphTest {
 	@Test
 	void testIsCyclicOneVertex() {
 		graph.insertVertex(new Vertex("0"));
+		assertFalse(graph.isCyclic());
+	}
+
+	@Test
+	void testIsCyclicTwoVertices() {
+		graph.insertVertex(new Vertex("0"));
+		graph.insertVertex(new Vertex("1"));
+
+		graph.insertEdge(0, 1, 42);
+
+		assertFalse(graph.isCyclic());
+	}
+
+	@Test
+	void testIsConnectedStraightLine() {
+		graph.insertVertex(new Vertex("0"));
+		graph.insertVertex(new Vertex("1"));
+		graph.insertVertex(new Vertex("2"));
+		graph.insertVertex(new Vertex("3"));
+		graph.insertVertex(new Vertex("4"));
+
+		graph.insertEdge(0, 1, 0);
+		graph.insertEdge(1, 2, 0);
+		graph.insertEdge(2, 3, 0);
+		graph.insertEdge(3, 4, 0);
+
 		assertFalse(graph.isCyclic());
 	}
 
