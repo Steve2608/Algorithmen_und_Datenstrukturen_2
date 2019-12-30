@@ -8,7 +8,7 @@ import java.util.function.BiPredicate;
 public class Graph {
 
 	protected MyVertex[] vertices = new MyVertex[1];
-	protected DirectedEdge[] directedEdges = new DirectedEdge[0];
+	protected MyEdge[] directedEdges = new MyEdge[0];
 
 	// pointers for first free Index of Array since there is NO way to remove vertices
 	private int nVertices = 0;
@@ -24,15 +24,13 @@ public class Graph {
 	}
 
 	public MyVertex[] getVertices() {
-		final MyVertex[] result = new MyVertex[nVertices];
-		System.arraycopy(vertices, 0, result, 0, nVertices);
-		return result;
+		return Arrays.copyOf(vertices, nVertices);
 	}
 
 	public int insertVertex(final MyVertex v) throws IllegalArgumentException {
 		if (v == null) throw new IllegalArgumentException("Cannot insert null-Element");
 
-		for (int i = 0; i < getNumberOfVertices(); i++) {
+		for (int i = 0; i < nVertices; i++) {
 			if (vertices[i].equals(v)) return -1;
 		}
 
@@ -98,7 +96,7 @@ public class Graph {
 	}
 
 	public int[][] getAdjacencyMatrix() {
-		final int[][] matrix = new int[getNumberOfVertices()][getNumberOfVertices()];
+		final int[][] matrix = new int[nVertices][nVertices];
 
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
@@ -225,7 +223,7 @@ public class Graph {
 			this.count = count;
 		}
 
-		public Adjacency(final boolean[] vertices, final int count) {
+		private Adjacency(final boolean[] vertices, final int count) {
 			this.vertices = vertices;
 			this.count = count;
 		}
@@ -233,7 +231,7 @@ public class Graph {
 
 	protected static class DirectedEdge extends MyEdge {
 
-		public DirectedEdge(final int out, final int in, final int weight) {
+		protected DirectedEdge(final int out, final int in, final int weight) {
 			this.out = out;
 			this.in = in;
 			this.weight = weight;
@@ -266,7 +264,7 @@ public class Graph {
 
 	protected static class UndirectedEdge extends DirectedEdge {
 
-		public UndirectedEdge(final int out, final int in, final int weight) {
+		protected UndirectedEdge(final int out, final int in, final int weight) {
 			super(out, in, weight);
 		}
 
