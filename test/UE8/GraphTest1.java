@@ -2,13 +2,10 @@ package UE8;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class GraphTest {
+public class GraphTest1 {
 
 	/**
 	 * Fields of <tt>MyEdge</tt> are to be interpreted as:
@@ -167,6 +164,33 @@ public class GraphTest {
 	}
 
 	@Test
+	void testGetNumberOfEdges() {
+		assertEquals(0, graph.getNumberOfEdges(), "Empty graph has 0 edges");
+
+		graph.insertVertex(new Vertex("0"));
+		graph.insertVertex(new Vertex("1"));
+		graph.insertVertex(new Vertex("2"));
+
+		graph.insertEdge(0, 1, 0);
+		assertEquals(1, graph.getNumberOfEdges());
+
+		graph.insertEdge(0, 2, 0);
+		assertEquals(2, graph.getNumberOfEdges());
+
+		graph.insertEdge(2, 1, 0);
+		assertEquals(3, graph.getNumberOfEdges());
+
+		graph.insertEdge(1, 2, 0);
+		assertEquals(4, graph.getNumberOfEdges());
+
+		graph.insertEdge(1, 2, 0);
+		assertEquals(4, graph.getNumberOfEdges());
+
+		assertThrows(IllegalArgumentException.class, () -> graph.insertEdge(1, 1, 0));
+		assertEquals(4, graph.getNumberOfEdges());
+	}
+
+	@Test
 	void testGetEdges() {
 		assertNotNull(graph.getEdges(), "Array must not be null");
 		assertEquals(0, graph.getEdges().length, "Empty edges must be of size 0");
@@ -226,168 +250,6 @@ public class GraphTest {
 		graph.insertVertex(new Vertex("5"));
 
 		assertThrows(IllegalArgumentException.class, () -> graph.getAdjacentVertices(8));
-	}
-
-	@Test
-	void testIsConnected() {
-		graph.insertVertex(new Vertex("0"));
-		graph.insertVertex(new Vertex("1"));
-		graph.insertVertex(new Vertex("2"));
-		graph.insertVertex(new Vertex("3"));
-		graph.insertVertex(new Vertex("4"));
-		graph.insertVertex(new Vertex("5"));
-
-		graph.insertEdge(0, 1, 0);
-		graph.insertEdge(2, 1, 0);
-		graph.insertEdge(4, 5, 0);
-		graph.insertEdge(0, 4, 0);
-		graph.insertEdge(0, 2, 0);
-		graph.insertEdge(3, 2, 0);
-		graph.insertEdge(1, 5, 0);
-
-		System.out.println(Arrays.toString(graph.getEdges()));
-
-		assertTrue(graph.isConnected());
-	}
-
-	@Test
-	void testIsNotConnected() {
-		graph.insertVertex(new Vertex("0"));
-		graph.insertVertex(new Vertex("1"));
-
-		graph.insertEdge(0, 1, 0);
-		assertTrue(graph.isConnected());
-
-		graph.insertVertex(new Vertex("2"));
-		assertFalse(graph.isConnected());
-	}
-
-	@Test
-	void testIsConnectedEmpty() {
-		assertFalse(graph.isConnected());
-	}
-
-	@Test
-	void testIsConnectedOneVertex() {
-		graph.insertVertex(new Vertex("0"));
-		assertTrue(graph.isConnected());
-	}
-
-	@Test
-	void testGetNumberOfComponents() {
-		graph.insertVertex(new Vertex("0"));
-		graph.insertVertex(new Vertex("1"));
-		graph.insertVertex(new Vertex("2"));
-		graph.insertVertex(new Vertex("3"));
-		graph.insertVertex(new Vertex("4"));
-		graph.insertVertex(new Vertex("5"));
-
-		graph.insertEdge(0, 1, 0);
-		graph.insertEdge(2, 1, 0);
-		graph.insertEdge(4, 5, 0);
-		graph.insertEdge(0, 4, 0);
-
-		assertEquals(2, graph.getNumberOfComponents());
-
-		graph.insertVertex(new Vertex("6"));
-		assertEquals(3, graph.getNumberOfComponents());
-
-		graph.insertEdge(6, 4, 0);
-		assertEquals(2, graph.getNumberOfComponents());
-
-		graph.insertEdge(3, 6, 0);
-		assertEquals(1, graph.getNumberOfComponents());
-	}
-
-	@Test
-	void testGetNumberOfComponentsEmpty() {
-		assertEquals(0, graph.getNumberOfComponents());
-	}
-
-	@Test
-	void testIsCyclic() {
-		graph.insertVertex(new Vertex("0"));
-		graph.insertVertex(new Vertex("1"));
-		graph.insertVertex(new Vertex("2"));
-		graph.insertVertex(new Vertex("3"));
-
-		graph.insertEdge(0, 1, 0);
-		graph.insertEdge(1, 2, 0);
-		graph.insertEdge(2, 3, 0);
-		graph.insertEdge(3, 0, 0);
-
-		assertTrue(graph.isCyclic());
-
-		graph.insertVertex(new Vertex("4"));
-
-		graph.insertVertex(new Vertex("5"));
-		graph.insertEdge(3, 4, 0);
-		graph.insertEdge(4, 5, 0);
-		graph.insertEdge(5, 0, 0);
-		assertTrue(graph.isCyclic());
-	}
-
-	@Test
-	void testIsCyclicEmpty() {
-		assertFalse(graph.isCyclic());
-	}
-
-	@Test
-	void testIsCyclicOneVertex() {
-		graph.insertVertex(new Vertex("0"));
-		assertFalse(graph.isCyclic());
-	}
-
-	@Test
-	void testIsCyclicTwoVertices() {
-		graph.insertVertex(new Vertex("0"));
-		graph.insertVertex(new Vertex("1"));
-
-		graph.insertEdge(0, 1, 42);
-
-		assertFalse(graph.isCyclic());
-	}
-
-	@Test
-	void testIsConnectedStraightLine() {
-		graph.insertVertex(new Vertex("0"));
-		graph.insertVertex(new Vertex("1"));
-		graph.insertVertex(new Vertex("2"));
-		graph.insertVertex(new Vertex("3"));
-		graph.insertVertex(new Vertex("4"));
-
-		graph.insertEdge(0, 1, 0);
-		graph.insertEdge(1, 2, 0);
-		graph.insertEdge(2, 3, 0);
-		graph.insertEdge(3, 4, 0);
-
-		assertFalse(graph.isCyclic());
-	}
-
-	private static class Vertex implements MyVertex {
-		private final String name;
-
-		private Vertex(final String name) {
-			this.name = name;
-		}
-
-		@Override
-		public boolean equals(final Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			final Vertex vertex = (Vertex) o;
-			return Objects.equals(name, vertex.name);
-		}
-
-		@Override
-		public int hashCode() {
-			return name.hashCode();
-		}
-
-		@Override
-		public String toString() {
-			return String.format("Vertex{'%s'}", name);
-		}
 	}
 
 	private static class Edge extends MyEdge {

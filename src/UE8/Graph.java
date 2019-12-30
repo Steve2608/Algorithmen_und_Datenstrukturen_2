@@ -38,9 +38,7 @@ public class Graph {
 
 	private int addVertex(final MyVertex v) {
 		if (nVertices >= vertices.length) {
-			final int doubleSize = vertices.length * 2;
-			vertices = Arrays.copyOf(vertices, doubleSize);
-			edges = Arrays.copyOf(edges, doubleSize * (doubleSize - 1));
+			vertices = Arrays.copyOf(vertices, vertices.length * 2);
 		}
 		vertices[nVertices] = v;
 		updateDFS = true;
@@ -93,6 +91,9 @@ public class Graph {
 	}
 
 	private boolean addEdge(final MyEdge e) {
+		if (nEdges >= edges.length) {
+			edges = Arrays.copyOf(edges, nVertices * (nVertices - 1));
+		}
 		edges[nEdges++] = e;
 		updateDFS = true;
 		// in this implementation edges should always have room in the array
@@ -108,6 +109,10 @@ public class Graph {
 			throw new IllegalArgumentException("Invalid Index (v2=" + v2 + ")");
 	}
 
+	public int getNumberOfEdges() {
+		return nEdges;
+	}
+
 	public MyEdge[] getEdges() {
 		return Arrays.copyOf(edges, nEdges);
 	}
@@ -115,8 +120,8 @@ public class Graph {
 	public int[][] getAdjacencyMatrix() {
 		final int[][] matrix = new int[nVertices][nVertices];
 
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[i].length; j++) {
+		for (int i = 0; i < nVertices; i++) {
+			for (int j = 0; j < nVertices; j++) {
 				// Setting to zero is not actually necessary because JVM already does that
 				matrix[i][j] = i != j && hasEdge(i, j) >= 0 ? 1 : 0;
 			}
