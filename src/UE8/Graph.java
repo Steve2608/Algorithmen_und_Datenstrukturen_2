@@ -1,8 +1,6 @@
 package UE8;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.BiPredicate;
 
@@ -17,9 +15,7 @@ public class Graph {
 
 	private boolean isCyclic = false;
 	private boolean updateDFS = true;
-
-	// Contains list of components, which in turn contain indices of their vertices
-	private List<List<Integer>> components;
+	private int[] components;
 
 	public int getNumberOfVertices() {
 		return nVertices;
@@ -166,12 +162,11 @@ public class Graph {
 
 		// marking every field as not visited
 		final boolean[] visited = new boolean[nVertices];
-		components = new ArrayList<>();
+		components = new int[nVertices];
 
-		for (int i = 0, component = 0; i < visited.length; i++) {
+		for (int i = 0, component = 1; i < visited.length; i++) {
 			if (!visited[i]) {
-				components.add(new ArrayList<>());
-				components.get(component).add(i);
+				components[i] = component;
 				visited[i] = true;
 				DFS(visited, i, -1, component++);
 			}
@@ -184,11 +179,11 @@ public class Graph {
 
 		for (int i = 0; i < nVertices; i++) {
 			if (adjacent[i] && i != child && i != par && hasUndirectedEdge(child, i) >= 0) {
-				if (components.get(component).contains(i)) {
+				if (components[i] == component) {
 					isCyclic = true;
 				} else {
 					visited[i] = true;
-					components.get(component).add(i);
+					components[i] = component;
 					DFS(visited, i, child, component);
 				}
 			}
@@ -202,11 +197,16 @@ public class Graph {
 
 	public int getNumberOfComponents() {
 		DFS();
-		return components.size();
+
+		int iComp = 0;
+		for (final int component : components) {
+			if (component > iComp) iComp = component;
+		}
+		return iComp;
 	}
 
 	public void printComponents() {
-		System.out.println(this);
+		System.out.println(toString());
 	}
 
 	public boolean isCyclic() {
@@ -216,23 +216,23 @@ public class Graph {
 
 	@Override
 	public String toString() {
-		DFS();
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < components.size(); i++) {
-			sb.append(component(i)).append('\n');
-		}
-		return sb.toString();
-	}
+		final int nComp = getNumberOfComponents();
 
-	private String component(final int index) {
-		final StringJoiner sj = new StringJoiner(", ", "{", "}");
-
-		final List<Integer> component = components.get(index);
-		for (final Integer vertex : component) {
-			sj.add(String.valueOf(vertex));
+		final StringJoiner[] sbs = new StringJoiner[nComp];
+		for (int i = 0; i < nComp; i++) {
+			sbs[i] = new StringJoiner(", ", String.format("Component #%d: [", i + 1), "]");
+			for (int j = 0; j < components.length; j++) {
+				if (components[j] == i + 1) {
+					sbs[i].add(String.valueOf(j));
+				}
+			}
 		}
 
-		return String.format("Component #%d: ", index + 1) + sj.toString();
+		final StringJoiner sj = new StringJoiner("\n", "Graph {\n", "\n}");
+		for (final StringJoiner sb : sbs) {
+			sj.add("\t" + sb.toString());
+		}
+		return sj.toString();
 	}
 
 	private static class Adjacency {
