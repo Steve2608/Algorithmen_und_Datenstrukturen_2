@@ -70,15 +70,19 @@ public class GraphTest2 {
 		graph.insertEdge(0, 4, 0);
 
 		assertEquals(2, graph.getNumberOfComponents());
+		assertDoesNotThrow(graph::printComponents);
 
 		graph.insertVertex(new Vertex("6"));
 		assertEquals(3, graph.getNumberOfComponents());
+		assertDoesNotThrow(graph::printComponents);
 
 		graph.insertEdge(6, 4, 0);
 		assertEquals(2, graph.getNumberOfComponents());
+		assertDoesNotThrow(graph::printComponents);
 
 		graph.insertEdge(3, 6, 0);
 		assertEquals(1, graph.getNumberOfComponents());
+		assertDoesNotThrow(graph::printComponents);
 	}
 
 	@Test
