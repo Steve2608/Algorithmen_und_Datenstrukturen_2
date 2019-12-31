@@ -43,7 +43,7 @@ public class Graph {
 	}
 
 	public int indexOf(final MyVertex v) {
-		if (v == null) throw new IllegalArgumentException("Vertices must not be null");
+		if (v == null) throw new IllegalArgumentException("Vertex must not be null");
 
 		for (int i = 0; i < nVertices; i++) {
 			if (vertices[i].equals(v)) return i;
@@ -99,10 +99,13 @@ public class Graph {
 	private void checkEdge(final int v1, final int v2) {
 		if (v1 == v2)
 			throw new IllegalArgumentException("Ident vertex indices (v1= " + v1 + " | v2= " + v2 + ")");
-		if (v1 < 0 || v1 >= nVertices)
-			throw new IllegalArgumentException("Invalid Index (v1=" + v1 + ")");
-		if (v2 < 0 || v2 >= nVertices)
-			throw new IllegalArgumentException("Invalid Index (v2=" + v2 + ")");
+		checkVertex(v1);
+		checkVertex(v2);
+	}
+
+	private void checkVertex(final int v) {
+		if (v < 0 || v >= nVertices)
+			throw new IllegalArgumentException("Invalid Index (v=" + v + ")");
 	}
 
 	public int getNumberOfEdges() {
@@ -126,20 +129,32 @@ public class Graph {
 	}
 
 	public MyVertex[] getAdjacentVertices(final int v) {
-		if (v < 0 || v >= vertices.length)
-			throw new IllegalArgumentException("Invalid Index (v=" + v + ")");
-		if (vertices[v] == null)
-			throw new IllegalArgumentException("Specified vertex is unknown (v=" + v + ")");
+		checkVertex(v);
 
-		final Adjacency adjacency = getAdjacentBitVector(v, (a, b) -> hasEdge(a, b) >= 0);
-		final MyVertex[] adj = new MyVertex[adjacency.count];
+		final int[] adj = getAdjacentIndices(v, true);
+		final MyVertex[] verts = new MyVertex[adj.length];
+		for (int i = 0; i < adj.length; i++) {
+			verts[i] = vertices[adj[i]];
+		}
+		return verts;
+	}
 
-		for (int i = 0, count = 0; i < nVertices; i++) {
-			if (adjacency.vertices[i]) {
-				adj[count++] = vertices[i];
-			}
+	private int[] getAdjacentIndices(final int v, final boolean directed) {
+		checkVertex(v);
+
+		final Adjacency adjacency;
+		if (directed) {
+			adjacency = getAdjacentBitVector(v, (a, b) -> hasEdge(a, b) >= 0);
+		} else {
+			adjacency = getAdjacentBitVector(v, (a, b) -> hasUndirectedEdge(a, b) >= 0);
 		}
 
+		final int[] adj = new int[adjacency.count];
+		for (int i = 0, count = 0; i < nVertices; i++) {
+			if (adjacency.vertices[i]) {
+				adj[count++] = i;
+			}
+		}
 		return adj;
 	}
 
@@ -175,16 +190,16 @@ public class Graph {
 	}
 
 	private void DFS(final boolean[] visited, final int child, final int par, final int component) {
-		final boolean[] adjacent = getAdjacentBitVector(child, (a, b) -> hasUndirectedEdge(a, b) >= 0).vertices;
+		final int[] adjacent = getAdjacentIndices(child, false);
 
-		for (int i = 0; i < nVertices; i++) {
-			if (adjacent[i] && i != child && i != par && hasUndirectedEdge(child, i) >= 0) {
-				if (components[i] == component) {
+		for (final int adj : adjacent) {
+			if (adj != par && hasUndirectedEdge(child, adj) >= 0) {
+				if (components[adj] == component) {
 					isCyclic = true;
 				} else {
-					visited[i] = true;
-					components[i] = component;
-					DFS(visited, i, child, component);
+					visited[adj] = true;
+					components[adj] = component;
+					DFS(visited, adj, child, component);
 				}
 			}
 		}
